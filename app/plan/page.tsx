@@ -2,16 +2,20 @@ import {
   BadgeCheck,
   CalendarClock,
   CalendarPlus,
+  Gauge,
   ListChecks,
   Lock,
+  TriangleAlert,
 } from "lucide-react";
 import {
   getAbwesenheiten,
+  getAkutUebersicht,
   getAerztinnen,
   getSlots,
   getTerminarten,
 } from "@/lib/data";
 import { abwesenheitSperrtSlot, istOnlineBuchbar } from "@/lib/rules";
+import { KontingentForm } from "./kontingent-form";
 import { SlotForm } from "./slot-form";
 
 export const dynamic = "force-dynamic";
@@ -54,11 +58,12 @@ function Abschnitt({
 }
 
 export default async function PlanPage() {
-  const [terminarten, aerztinnen, slots, abwesenheiten] = await Promise.all([
+  const [terminarten, aerztinnen, slots, abwesenheiten, akut] = await Promise.all([
     getTerminarten(),
     getAerztinnen(),
     getSlots(),
     getAbwesenheiten(),
+    getAkutUebersicht(),
   ]);
 
   return (
@@ -118,6 +123,67 @@ export default async function PlanPage() {
       >
         <div className="rounded-card border border-line bg-surface p-6 shadow-sm sm:p-7">
           <SlotForm aerztinnen={aerztinnen.map((a) => ({ id: a.id, name: a.name }))} />
+        </div>
+      </Abschnitt>
+
+      <Abschnitt
+        icon={Gauge}
+        titel="Akut-Kontingent"
+        beschreibung="Wie viele Akutslots es je Vormittag und Nachmittag gibt (BR1)."
+      >
+        <div className="rounded-card border border-line bg-surface p-6 shadow-sm sm:p-7">
+          <KontingentForm aktuell={akut.kontingent} />
+          <div className="mt-6">
+            {akut.halbtage.length === 0 ? (
+              <p className="rounded-lg bg-sand px-4 py-6 text-center text-sm text-ink-muted">
+                Noch keine Akutslots angelegt.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-line text-left text-xs tracking-wide text-ink-muted uppercase">
+                      <th className="px-4 py-3 font-medium">Datum</th>
+                      <th className="px-4 py-3 font-medium">Halbtag</th>
+                      <th className="px-4 py-3 font-medium">Angelegt</th>
+                      <th className="px-4 py-3 text-right font-medium">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {akut.halbtage.map((h) => (
+                      <tr
+                        key={`${h.datum}-${h.halbtag}`}
+                        className="border-b border-line last:border-0"
+                      >
+                        <td className="px-4 py-3 tabular">
+                          {formatDatum(new Date(`${h.datum}T00:00:00`))}
+                        </td>
+                        <td className="px-4 py-3 text-ink-muted">
+                          {h.halbtag === "VORMITTAG" ? "Vormittag" : "Nachmittag"}
+                        </td>
+                        <td className="px-4 py-3 tabular">
+                          {h.angelegt}/{akut.kontingent}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {h.platzFrei ? (
+                            <span className="inline-flex items-center gap-1 rounded-pill bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent">
+                              <BadgeCheck className="size-3.5" aria-hidden />
+                              {h.frei} frei
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-pill bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+                              <TriangleAlert className="size-3.5" aria-hidden />
+                              keine Akutslots frei
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </Abschnitt>
 

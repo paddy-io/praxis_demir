@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Halbtag, SlotArt } from "@/generated/prisma/enums";
 import { abwesenheitSperrtSlot } from "@/lib/rules";
+import { getAkutUebersicht as akutUebersicht } from "@/lib/akut";
 
 export function getTerminarten() {
   return prisma.terminart.findMany({ orderBy: { dauerMinuten: "desc" } });
@@ -63,6 +64,13 @@ export function getBetroffeneTermine() {
     orderBy: [{ slot: { datum: "asc" } }],
     include: { slot: true, aerztin: true, patient: true, terminart: true },
   });
+}
+
+// --- F-006 Akut-Kontingent ---
+
+// Wrapper mit dem Singleton-Client, damit die Seite nichts ueber Prisma wissen muss.
+export function getAkutUebersicht() {
+  return akutUebersicht(prisma);
 }
 
 // --- F-005 Terminverwaltung ---

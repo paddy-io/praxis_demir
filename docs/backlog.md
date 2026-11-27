@@ -22,7 +22,7 @@ Ein Feature ist ein Ablauf, den eine Person von Anfang bis Ende durchspielen kan
 
 | ID | Name | Phase | Status | BR/Entitäten |
 |---|---|---|---|---|
-| F-006 | Akut-Kontingent je Halbtag führen und "keine Akutslots frei" anzeigen | 2 | offen | BR1 - Slot, Termin |
+| F-006 | Akut-Kontingent je Halbtag führen und "keine Akutslots frei" anzeigen | 2 | fertig | BR1 - Slot, Termin |
 | F-007 | No-Show erfassen, rollierend zählen, erinnern und Online-Sperre setzen/heben | 2 | offen | BR2 - Termin, Patient, MFA, Einwilligung |
 | F-008 | Rezeptantrag anlegen und durch eine Ärzt:in freigeben | 2 | offen | BR3 - Rezeptantrag, MFA, Ärztin |
 | F-009 | Erstgespräch telefonisch vorklären und Termin vergeben | 2 | offen | BR6, BR8 - Termin, MFA, Ärztin |

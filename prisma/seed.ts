@@ -95,6 +95,13 @@ async function main() {
     },
   });
 
+  // F-006: praxisweite Einstellung (Akut-Kontingent je Halbtag).
+  await prisma.praxisEinstellung.upsert({
+    where: { id: 1 },
+    update: {},
+    create: { id: 1, akutKontingentProHalbtag: 2 },
+  });
+
   // F-005: MFAs zum Erfassen von Terminen (fiktive Namen).
   const mfas = ["MFA Ayse", "MFA Nadine", "MFA Petra", "MFA Sven"];
   for (const name of mfas) {

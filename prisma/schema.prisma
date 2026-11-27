@@ -202,3 +202,15 @@ model MFA {
 
   @@map("mfa")
 }
+
+// --- F-006 Akut-Kontingent je Halbtag (BR1) ---
+
+// Praxisweite Einstellungen als Einzelzeile (id ist immer 1). Die SPEC nennt
+// keine Zahl fuer das Akut-Kontingent (offene Frage M2-8), deshalb ist der Wert
+// einstellbar und nicht fest im Code.
+model PraxisEinstellung {
+  id                       Int @id @default(1)
+  akutKontingentProHalbtag Int @default(2)
+
+  @@map("praxis_einstellung")
+}

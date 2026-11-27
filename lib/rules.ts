@@ -56,6 +56,38 @@ export function akutHinweis(
     : "keine Akutslots frei";
 }
 
+export type AkutStatus = {
+  kontingent: number;
+  angelegt: number;
+  frei: number;
+  platzFrei: boolean;
+  hinweis: string;
+};
+
+// Status eines Halbtags: wie viele Akutslots gibt es, wie viele sind noch frei.
+export function akutStatusFuerHalbtag(
+  kontingent: number,
+  angelegteAkutslots: number,
+): AkutStatus {
+  const frei = freieAkutslots(kontingent, angelegteAkutslots);
+  return {
+    kontingent,
+    angelegt: angelegteAkutslots,
+    frei,
+    platzFrei: frei > 0,
+    hinweis: akutHinweis(kontingent, angelegteAkutslots),
+  };
+}
+
+// BR1: Solange das Kontingent fuer den Halbtag nicht erreicht ist, darf ein
+// weiterer Akutslot angelegt werden.
+export function darfAkutslotAnlegen(
+  kontingent: number,
+  angelegteAkutslots: number,
+): boolean {
+  return akutslotsVerfuegbar(kontingent, angelegteAkutslots);
+}
+
 // --- BR4 Abwesenheit und Praxisschliessung (SPEC 4) ---
 // Eine Abwesenheit sperrt nur die Slots der betroffenen Aerzt:in. Eine
 // Praxisschliessung sperrt alle Slots des Tages. Die Pruefung ist taggenau und

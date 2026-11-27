@@ -253,3 +253,32 @@ durch die MFA (BR7), und BR5 („ein Slot, ein Termin") gilt kanalunabhängig.
 **Nicht Teil von F-005:** No-Show und Erschienen (F-007), Nachtrag „nachtraeglich
 erfasst" (F-010), Akut-Kontingent (F-006), Rezeptanträge (F-008), Anlegen neuer
 Patient:innen.
+
+## 2026-11-27 - F-006 umgesetzt
+
+**Was:** F-006 „Akut-Kontingent je Halbtag führen" ist gebaut. Neues Modell
+`PraxisEinstellung` als Einzelzeile (`akutKontingentProHalbtag`, Default 2),
+Migration `f006_akut_kontingent`. Regeln in `lib/rules.ts`
+(`akutStatusFuerHalbtag`, `darfAkutslotAnlegen`), Logik in `lib/akut.ts`
+(`getAkutKontingent`, `setAkutKontingent`, `hatAkutPlatz`, `getAkutUebersicht`),
+neuer Abschnitt „Akut-Kontingent" auf `/plan`. Tests in `tests/akut.test.ts` und
+`tests/akut.integration.test.ts`.
+
+**Warum:** Erstes Feature der Phase 2. BR1 begrenzt Akutslots je Vormittag und
+Nachmittag und verlangt die Anzeige „keine Akutslots frei". Die Rechenfunktionen
+gab es schon aus F-001, sie waren aber nirgends angeschlossen.
+
+**Entscheidungen:**
+- Die Höhe des Kontingents nennt die SPEC nicht (offene Frage M2-8). Sie liegt
+  deshalb in der Datenbank (`PraxisEinstellung`) und ist über die Oberfläche
+  einstellbar, statt fest im Code zu stehen. Der frühere Wert 2 ist nur noch der
+  Default.
+- Das Kontingent gilt praxisweit je Tag und Halbtag, nicht je Ärztin (Lesart von
+  „pro Vormittag und Nachmittag").
+- Beim Anlegen eines Akutslots prüft `app/plan/actions.ts` das Kontingent und lehnt
+  mit klarer Meldung ab, wenn es erreicht ist. Normalslots sind nicht betroffen.
+- Kein neuer Menüpunkt: Der Abschnitt liegt auf `/plan`, wo auch die Slots gepflegt
+  werden. So bleibt die Navigation schlank.
+
+**Nicht Teil von F-006:** Nachtrag/„nachtraeglich erfasst" bei Kulanz (F-010),
+automatisches Umbuchen (Out of Scope), Online-Buchung von Akut (Out of Scope).
