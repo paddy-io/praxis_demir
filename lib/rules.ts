@@ -177,3 +177,22 @@ export function versandHinweis(
     ? `${kanal === "EMAIL" ? "E-Mail" : "SMS"} erlaubt`
     : `kein Opt-in für ${kanal === "EMAIL" ? "E-Mail" : "SMS"}`;
 }
+
+// --- BR7 Terminverwaltung und Terminzustaende (SPEC 4) ---
+// Termine eintragen, aendern und absagen darf nur die MFA. Nur gebuchte oder
+// betroffene Termine lassen sich umbuchen oder absagen; abgesagte, erschienene
+// und No-Show-Termine nicht.
+
+export function darfTerminVerwalten(rolle: Rolle): boolean {
+  return rolle === "MFA";
+}
+
+const AENDERBAR = ["GEBUCHT", "BETROFFEN"] as const;
+
+export function terminAenderbar(status: string): boolean {
+  return (AENDERBAR as readonly string[]).includes(status);
+}
+
+export function terminAbsagbar(status: string): boolean {
+  return (AENDERBAR as readonly string[]).includes(status);
+}

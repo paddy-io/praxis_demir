@@ -127,6 +127,9 @@ model Termin {
   patientId            Int
   aerztinId            Int
   terminartId          Int
+  // Nur bei manuell erfassten Terminen (Telefon/Tresen) gesetzt; Online-
+  // Buchungen haben keine MFA (SPEC Beziehung 10).
+  erfasstVonId         Int?
   // BR5: hoechstens ein Termin je Slot. Die Eindeutigkeit erzwingt das auf
   // Datenbank-Ebene, unabhaengig vom Kanal.
   slotId               Int            @unique
@@ -134,6 +137,7 @@ model Termin {
   aerztin              Aerztin        @relation(fields: [aerztinId], references: [id])
   terminart            Terminart      @relation(fields: [terminartId], references: [id])
   slot                 Slot           @relation(fields: [slotId], references: [id])
+  erfasstVon           MFA?           @relation(fields: [erfasstVonId], references: [id])
 
   @@map("termin")
 }
@@ -186,4 +190,15 @@ model Einwilligung {
 
   @@unique([patientId, kanal])
   @@map("einwilligung")
+}
+
+// --- F-005 Termine erfassen, aendern und absagen (BR5, BR7) ---
+
+// Die MFA erfasst Termine. Alle MFAs haben dieselben Rechte (BR7).
+model MFA {
+  id      Int      @id @default(autoincrement())
+  name    String
+  termine Termin[]
+
+  @@map("mfa")
 }

@@ -220,3 +220,36 @@ Versand (BR9).
 
 **Nicht Teil von F-004:** der tatsächliche Versand (E-Mail/Brief) und die
 Erinnerung selbst. F-004 liefert nur die Verwaltung und die Prüffunktion.
+
+## 2026-11-27 - F-005 umgesetzt
+
+**Was:** F-005 „Termine erfassen, ändern und absagen (Telefon und Tresen)" ist
+gebaut. Neues Modell `MFA` und optionales `Termin.erfasstVonId`, Migration
+`f005_terminverwaltung`. Gemeinsame BR5-Helfer in `lib/slots.ts` (`belegeSlot`,
+`gibSlotFrei`), Regeln in `lib/rules.ts` (`darfTerminVerwalten`,
+`terminAenderbar`, `terminAbsagbar`), Abläufe in `lib/terminverwaltung.ts`
+(`erfasseTermin`, `aendereTermin`, `sageTerminAb`), Seite `/termine`. Tests in
+`tests/terminverwaltung.test.ts` und `tests/terminverwaltung.integration.test.ts`.
+
+**Warum:** Letztes Feature der Phase 1. v1 verlangt Termine an Telefon und Tresen
+durch die MFA (BR7), und BR5 („ein Slot, ein Termin") gilt kanalunabhängig.
+
+**Entscheidungen:**
+- Die MFA ist ein eigenes Modell (`MFA`), wie in der SPEC genannt; `Termin` hält
+  optional fest, wer einen Termin erfasst hat (SPEC Beziehung 10). Online-Buchungen
+  haben keine MFA.
+- Der Sperrcode für BR5 liegt jetzt einmal in `lib/slots.ts` und wird von der
+  Online-Buchung (`lib/buchen.ts`) und der manuellen Verwaltung genutzt.
+- Manuell sind alle Terminarten erlaubt – BR6 (Online-Buchbarkeit) gilt nur für die
+  Online-Buchung. Akut, Blutabnahme und Erstgespräch lassen sich also am Tresen
+  erfassen. Eine hinterlegte Abwesenheit sperrt den Slot trotzdem.
+- Umbuchen ist eine Transaktion: neuer Slot wird zuerst gesperrt, dann der alte
+  freigegeben, dann der Termin aktualisiert. Absagen setzt den Status `ABSAGT` und
+  gibt den Slot wieder frei.
+- Änderbar/absagbar sind nur `GEBUCHT` und `BETROFFEN`; `ABSAGT`, `ERSCHIENEN` und
+  `NO_SHOW` sind gesperrt.
+- Hinweis: Prisma benennt den Accessor `mFA` (Tabellenname bleibt `mfa`).
+
+**Nicht Teil von F-005:** No-Show und Erschienen (F-007), Nachtrag „nachtraeglich
+erfasst" (F-010), Akut-Kontingent (F-006), Rezeptanträge (F-008), Anlegen neuer
+Patient:innen.

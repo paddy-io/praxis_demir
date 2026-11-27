@@ -8,6 +8,7 @@ const nav = [
   { href: "/", label: "Start" },
   { href: "/buchen", label: "Termin buchen" },
   { href: "/plan", label: "Terminplan" },
+  { href: "/termine", label: "Termine" },
   { href: "/abwesenheit", label: "Abwesenheit" },
   { href: "/einwilligungen", label: "Einwilligungen" },
 ];

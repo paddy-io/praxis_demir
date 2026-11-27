@@ -95,8 +95,17 @@ async function main() {
     },
   });
 
+  // F-005: MFAs zum Erfassen von Terminen (fiktive Namen).
+  const mfas = ["MFA Ayse", "MFA Nadine", "MFA Petra", "MFA Sven"];
+  for (const name of mfas) {
+    const vorhanden = await prisma.mFA.findFirst({ where: { name } });
+    if (!vorhanden) {
+      await prisma.mFA.create({ data: { name } });
+    }
+  }
+
   console.log(
-    "Seed fertig: 3 Aerztinnen, 7 Terminarten, Zuordnungen und 3 Testpatient:innen.",
+    "Seed fertig: 3 Aerztinnen, 7 Terminarten, Zuordnungen, 4 MFAs und 3 Testpatient:innen.",
   );
 }
 

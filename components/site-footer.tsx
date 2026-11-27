@@ -41,6 +41,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/termine" className="text-ink transition hover:text-accent">
+                Termine
+              </Link>
+            </li>
+            <li>
               <Link
                 href="/abwesenheit"
                 className="text-ink transition hover:text-accent"

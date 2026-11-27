@@ -65,6 +65,32 @@ export function getBetroffeneTermine() {
   });
 }
 
+// --- F-005 Terminverwaltung ---
+
+export function getMFAs() {
+  return prisma.mFA.findMany({ orderBy: { name: "asc" } });
+}
+
+// Alle freien Slots (auch nicht online buchbare), fuer Telefon und Tresen.
+export async function getFreieSlots() {
+  const [slots, abwesenheiten] = await Promise.all([
+    prisma.slot.findMany({
+      where: { status: "FREI" },
+      orderBy: [{ datum: "asc" }, { beginn: "asc" }],
+      include: { aerztin: { include: { terminarten: true } } },
+    }),
+    prisma.abwesenheit.findMany(),
+  ]);
+  return slots.filter((slot) => !abwesenheitSperrtSlot(abwesenheiten, slot));
+}
+
+export function getTermine() {
+  return prisma.termin.findMany({
+    orderBy: [{ slot: { datum: "asc" } }, { slot: { beginn: "asc" } }],
+    include: { slot: true, aerztin: true, terminart: true, patient: true },
+  });
+}
+
 export type NeuerSlot = {
   aerztinId: number;
   datum: string; // "YYYY-MM-DD"

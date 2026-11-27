@@ -5,6 +5,7 @@
 import type { PrismaClient } from "@/generated/prisma/client";
 import { pruefeBuchung, pruefeIdentifikation } from "./booking.ts";
 import { abwesenheitSperrtSlot } from "./rules.ts";
+import { belegeSlot } from "./slots.ts";
 
 export type BuchungsWunsch = {
   // Eindeutige Identifikation (BR9): je nach Versicherungsart eine der Nummern.
@@ -79,13 +80,10 @@ export async function bucheOnlineTermin(
 
   try {
     const terminId = await prisma.$transaction(async (tx) => {
-      // BR5: Slot nur sperren, wenn er noch frei ist. Zaehlt 0 Zeilen, war
-      // jemand schneller und die Buchung bricht ab.
-      const gesperrt = await tx.slot.updateMany({
-        where: { id: slot.id, status: "FREI" },
-        data: { status: "BELEGT" },
-      });
-      if (gesperrt.count === 0) {
+      // BR5: Slot nur sperren, wenn er noch frei ist. War jemand schneller,
+      // bricht die Buchung ab.
+      const gesperrt = await belegeSlot(tx, slot.id);
+      if (!gesperrt) {
         throw new Error("SLOT_BELEGT");
       }
 
