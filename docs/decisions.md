@@ -89,3 +89,54 @@ Annahme „nur Bestandspatient:innen" aus SPEC §7 ist umgesetzt.
 
 **Tests:** `npm test` läuft mit `node --test --import tsx`; Integrationstests bauen
 eine temporäre SQLite-Datei aus den echten Migrationen auf (`tests/helpers/testdb.ts`).
+
+## 2026-11-27 - Feinschliff Design-System (Richtung LumaDental)
+
+**Was:** Das Farb- und Schrift-System in `app/globals.css` wurde überarbeitet.
+Grundfläche ist jetzt ein wärmeres Elfenbein (`#faf7f2`), Karten sind echt weiß
+(`#ffffff`), dazu eine gedämpfte Sektionston-Fläche `sand` (`#f1ebe1`). Text und
+Überschriften laufen in tiefem Waldgrün (`#17332b`), Labels gedämpft (`#5d6b64`).
+Der Akzent bleibt das kräftige Grün (`#1f6b5c`), ergänzt um `accent-strong`
+(`#175548`) für Hover. Zusätzlich: Überschriften zentral in der Serife, sanfter
+Scroll, grünliche Textauswahl, sichtbarer Fokusring, weichere Karten-Radien.
+
+**Warum:** Wunsch, die Oberfläche an eine ruhige, editoriale Dental-Referenz
+anzunähern (warme Töne, viel Weißraum, kräftige Serifen-Überschriften, ein
+einziger Akzent). `AGENTS.md` verlangt getönte Grundfläche, kräftige Akzentfarbe
+ohne Indigo/Lila und eine Schrift mit Charakter.
+
+**Hinweis:** Reiner Design-Durchgang, kein neues Feature. Logik und Datenmodell
+unverändert; `npm test` bleibt bei 21/21 grün.
+
+**Nächste Schritte (Design, noch offen):** gemeinsamer Rahmen (Header/Footer),
+Startseite als editorialer Hero mit Trust-Reihe, Aufwertung von `/buchen` und
+`/plan`. Bilder: entweder ohne Fotos (ruhige Flächen/Linien) oder 2-3 dezente
+Bilder per Imagegen.
+
+## 2026-11-27 - Design-Durchgang: Rahmen und Startseite
+
+**Was:** Gemeinsamer Rahmen und neue Startseite.
+
+- `components/site-header.tsx`: klebender Header mit Wortmarke, Navigation
+  (Start / Termin buchen / Terminplan) und grünem CTA. Der aktive Menüpunkt wird
+  über `usePathname` grün hervorgehoben.
+- `components/site-footer.tsx`: dreispaltiger Footer (Kurzbeschreibung,
+  Navigation, Kontakt-Hinweise).
+- `app/layout.tsx`: Header und Footer eingebunden, Body als
+  `min-h-screen flex-col`, damit der Footer unten sitzt.
+- `app/page.tsx`: editorialer Hero mit zwei CTAs, ruhiges Panel ohne Fotos
+  (Verläufe/Linien plus Team-Liste), Trust-Reihe mit belegten Zahlen aus der SPEC
+  (3 Ärzt:innen, 4 MFAs, 2.500 Stammpatient:innen, 80–110 Termine/Tag), Ablauf in
+  drei nummerierten Karten und ein grüner Abschluss-CTA.
+
+**Warum:** Fortsetzung der Richtung „ruhig und editorial" (Richtung LumaDental).
+Wiedererkennbarer Rahmen für alle Seiten, Startseite als ruhiger Einstieg mit
+Trust-Elementen.
+
+**Keine erfundenen Daten:** Adresse und Sprechzeiten stehen nicht in der SPEC und
+wurden bewusst weggelassen. Nur belegte Fakten verwendet.
+
+**Hinweis:** Reiner Design-Durchgang, kein neues Feature. `npm test` bleibt bei
+21/21 grün, Typecheck und Lint sauber.
+
+**Noch offen (Design):** Aufwertung von `/buchen` und `/plan` (Schritt 4).

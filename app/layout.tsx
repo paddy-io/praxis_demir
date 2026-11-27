@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,7 +31,11 @@ export default function RootLayout({
       {/* suppressHydrationWarning: Browser-Erweiterungen (z. B. Grammarly) setzen
           eigene Attribute ins <body>, bevor React übernimmt. Das ist kein Fehler
           der App; die Warnung wird hier bewusst nur für dieses Element stumm gestellt. */}
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning className="flex min-h-screen flex-col">
+        <SiteHeader />
+        <div className="flex-1">{children}</div>
+        <SiteFooter />
+      </body>
     </html>
   );
 }

@@ -1,23 +1,37 @@
 @import "tailwindcss";
 
+/* Farb- und Schrift-System: ruhig und editorial (LumaDental-Richtung).
+   Warme Elfenbein-Grundfläche, weiße Karten, tiefes Waldgrün als Text,
+   ein einziger kräftiger Grün-Akzent für Hauptaktionen. */
 @theme {
-  --color-canvas: #f6f3ee;
-  --color-surface: #fffdfa;
-  --color-ink: #26231f;
-  --color-ink-muted: #6f6a62;
-  --color-line: #e6e0d7;
-  --color-accent: #1f6b5c;
-  --color-accent-soft: #e4efe9;
+  /* Flächen */
+  --color-canvas: #faf7f2; /* warmes Elfenbein – Grundfläche */
+  --color-surface: #ffffff; /* Karten */
+  --color-sand: #f1ebe1; /* gedämpfte Sektionen */
 
+  /* Text und Linien */
+  --color-ink: #17332b; /* tiefes Waldgrün – Überschriften und Text */
+  --color-ink-muted: #5d6b64; /* gedämpfte Labels */
+  --color-line: #e8e1d6;
+
+  /* Akzent */
+  --color-accent: #1f6b5c; /* Hauptaktionen und aktiver Menüpunkt */
+  --color-accent-strong: #175548; /* Hover/aktiver Zustand */
+  --color-accent-soft: #e3efe9;
+
+  /* Schrift */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 
-  --radius-card: 0.875rem;
+  /* Form */
+  --radius-card: 1rem;
+  --radius-pill: 999px;
 }
 
 @layer base {
   html {
     color-scheme: light;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -25,11 +39,25 @@
     color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: var(--color-accent-soft);
+    color: var(--color-ink);
   }
 
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+    border-radius: 2px;
   }
 }
 
