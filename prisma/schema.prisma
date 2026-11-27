@@ -1,0 +1,11 @@
+// Prisma 7 Schema. Die Verbindungs-URL steht in prisma.config.ts.
+// Datenmodell (Entitaeten aus SPEC.md) entsteht mit dem ersten Feature (F-001).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}

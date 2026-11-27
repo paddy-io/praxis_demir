@@ -1,0 +1,26 @@
+# Abhaengigkeiten
+/node_modules
+
+# Next.js
+/.next/
+/out/
+/build
+next-env.d.ts
+
+# Prisma (generierter Client, lokale DB)
+/generated/
+*.db
+*.db-journal
+
+# Umgebung (keine Secrets ins Repo)
+.env
+.env*.local
+
+# Betriebssystem / Editor
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vercel
+*.tsbuildinfo
