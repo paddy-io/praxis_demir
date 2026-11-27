@@ -62,7 +62,42 @@ async function main() {
     }
   }
 
-  console.log("Seed fertig: 3 Aerztinnen, 7 Terminarten, Zuordnungen gesetzt.");
+  // Fiktive Bestandspatient:innen zum Ausprobieren (keine echten Daten).
+  await prisma.patient.upsert({
+    where: { versichertennummer: "A123456789" },
+    update: {},
+    create: {
+      name: "Anna Beispiel",
+      versicherungsart: "GESETZLICH",
+      versichertennummer: "A123456789",
+      status: "BESTAND",
+    },
+  });
+  await prisma.patient.upsert({
+    where: { patientennummer: "P-1000" },
+    update: {},
+    create: {
+      name: "Bernd Muster",
+      versicherungsart: "PRIVAT",
+      patientennummer: "P-1000",
+      status: "BESTAND",
+    },
+  });
+  await prisma.patient.upsert({
+    where: { versichertennummer: "C000000001" },
+    update: {},
+    create: {
+      name: "Clara Gesperrt",
+      versicherungsart: "GESETZLICH",
+      versichertennummer: "C000000001",
+      status: "BESTAND",
+      onlineBuchungGesperrt: true,
+    },
+  });
+
+  console.log(
+    "Seed fertig: 3 Aerztinnen, 7 Terminarten, Zuordnungen und 3 Testpatient:innen.",
+  );
 }
 
 main()

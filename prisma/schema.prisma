@@ -32,6 +32,7 @@ model Aerztin {
   name         String
   slots        Slot[]
   terminarten  AerztinTerminart[]
+  termine      Termin[]
 
   @@map("aerztin")
 }
@@ -42,6 +43,7 @@ model Terminart {
   dauerMinuten Int
   onlineBuchbar Boolean           @default(false)
   aerztinnen   AerztinTerminart[]
+  termine      Termin[]
 
   @@map("terminart")
 }
@@ -66,8 +68,70 @@ model Slot {
   status   SlotStatus @default(FREI)
   aerztinId Int
   aerztin  Aerztin    @relation(fields: [aerztinId], references: [id], onDelete: Cascade)
+  termin   Termin?
 
   // Ein Slot je Aerztin, Tag und Uhrzeit (Grundlage fuer "ein Slot, ein Termin").
   @@unique([aerztinId, datum, beginn])
   @@map("slot")
+}
+
+// --- F-002 Online-Termin buchen (BR5, BR6, BR9) ---
+
+enum Versicherungsart {
+  GESETZLICH
+  PRIVAT
+}
+
+enum PatientStatus {
+  NEU
+  BESTAND
+}
+
+enum TerminStatus {
+  GEBUCHT
+  ERSCHIENEN
+  ABSAGT
+  NO_SHOW
+  BETROFFEN
+}
+
+enum TerminKanal {
+  TELEFON
+  TRESEN
+  ONLINE
+}
+
+model Patient {
+  id                   Int              @id @default(autoincrement())
+  name                 String
+  versicherungsart     Versicherungsart
+  // Schluessel je Versicherungsart (SPEC 2): gesetzlich ueber Versichertennummer,
+  // privat ueber interne Patientennummer. Beide optional, aber eindeutig.
+  versichertennummer   String?          @unique
+  patientennummer      String?          @unique
+  status               PatientStatus    @default(BESTAND)
+  onlineBuchungGesperrt Boolean         @default(false)
+  termine              Termin[]
+
+  @@map("patient")
+}
+
+model Termin {
+  id                   Int            @id @default(autoincrement())
+  status               TerminStatus   @default(GEBUCHT)
+  kanal                TerminKanal    @default(ONLINE)
+  nachtraeglichErfasst Boolean        @default(false)
+  dringlichkeit        String?
+  patientId            Int
+  aerztinId            Int
+  terminartId          Int
+  // BR5: hoechstens ein Termin je Slot. Die Eindeutigkeit erzwingt das auf
+  // Datenbank-Ebene, unabhaengig vom Kanal.
+  slotId               Int            @unique
+  patient              Patient        @relation(fields: [patientId], references: [id])
+  aerztin              Aerztin        @relation(fields: [aerztinId], references: [id])
+  terminart            Terminart      @relation(fields: [terminartId], references: [id])
+  slot                 Slot           @relation(fields: [slotId], references: [id])
+
+  @@map("termin")
 }

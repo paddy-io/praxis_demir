@@ -68,3 +68,24 @@ Alternative bei Bedarf: Schriften selbst hosten (`next/font/local`).
 (`data-gr-ext-installed`, `data-new-gr-c-s-check-loaded`) ins `<body>`, bevor
 React übernimmt. Das erzeugt eine Hydration-Warnung, die nicht aus der App
 stammt. Die Unterdrückung gilt bewusst nur für dieses eine Element.
+
+## 2026-11-27 - F-002 umgesetzt
+
+**Was:** F-002 „Online-Termin buchen" ist gebaut: Modelle `Patient` und `Termin`,
+Migration `f002_online_buchung`, Buchungslogik in `lib/booking.ts` (Prüfungen) und
+`lib/buchen.ts` (transaktionale Buchung), die Seite `/buchen` mit
+Identifikation → Terminart → Slot → Bestätigung. Tests decken BR5, BR6 und BR9 ab.
+
+**Warum:** Zweites Feature aus Phase 1.
+
+**BR5 hart abgesichert:** `Termin.slotId` ist eindeutig (Datenbank-Ebene), und der
+Slot wird per bedingtem Update nur von `FREI` auf `BELEGT` gesetzt. Zwei
+gleichzeitige Buchungen desselben Slots können daher nicht beide gewinnen
+(Integrationstest gegen eine echte SQLite-Testdatenbank).
+
+**Entscheidungen:** Die `Einwilligung`-Entität (Opt-in, BR9-Versand) gehört zu F-004
+und wurde hier bewusst nicht angelegt, weil beim Buchen nichts versendet wird. Die
+Annahme „nur Bestandspatient:innen" aus SPEC §7 ist umgesetzt.
+
+**Tests:** `npm test` läuft mit `node --test --import tsx`; Integrationstests bauen
+eine temporäre SQLite-Datei aus den echten Migrationen auf (`tests/helpers/testdb.ts`).

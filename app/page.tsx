@@ -14,18 +14,33 @@ export default function Home() {
         Das Projekt ist eingerichtet. Oberfläche, Datenmodell und Regeln entstehen
         Feature für Feature, beginnend mit F-001 aus dem Backlog.
       </p>
-      <div className="rounded-card border border-line bg-surface p-6 shadow-sm">
-        <h2 className="font-display text-xl font-semibold">F-001 Terminplan</h2>
-        <p className="mt-2 text-sm text-ink-muted">
-          Terminarten ansehen und Slots für die Ärztinnen anlegen.
-        </p>
-        <Link
-          href="/plan"
-          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-white transition hover:opacity-90"
-        >
-          Zum Terminplan
-          <ArrowRight className="size-4" aria-hidden />
-        </Link>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="rounded-card border border-line bg-surface p-6 shadow-sm">
+          <h2 className="font-display text-xl font-semibold">Termin buchen</h2>
+          <p className="mt-2 text-sm text-ink-muted">
+            Als Patient:in einen freien Termin auswählen und verbindlich buchen.
+          </p>
+          <Link
+            href="/buchen"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-white transition hover:opacity-90"
+          >
+            Termin buchen
+            <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        </div>
+        <div className="rounded-card border border-line bg-surface p-6 shadow-sm">
+          <h2 className="font-display text-xl font-semibold">Terminplan (MFA)</h2>
+          <p className="mt-2 text-sm text-ink-muted">
+            Terminarten ansehen und Slots für die Ärztinnen anlegen.
+          </p>
+          <Link
+            href="/plan"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg border border-line px-4 py-2 font-medium text-ink transition hover:bg-canvas"
+          >
+            Zum Terminplan
+            <ArrowRight className="size-4" aria-hidden />
+          </Link>
+        </div>
       </div>
     </main>
   );

@@ -21,6 +21,25 @@ export function getSlots() {
   });
 }
 
+// F-002: alle freien Slots mit den Terminarten, die die Aerztin durchfuehren darf.
+// Die Oberflaeche filtert damit nach der gewaehlten Terminart.
+export function getFreieOnlineSlots() {
+  return prisma.slot.findMany({
+    where: { status: "FREI", art: "NORMAL" },
+    orderBy: [{ datum: "asc" }, { beginn: "asc" }],
+    include: {
+      aerztin: { include: { terminarten: true } },
+    },
+  });
+}
+
+export function getOnlineTerminarten() {
+  return prisma.terminart.findMany({
+    where: { onlineBuchbar: true },
+    orderBy: { dauerMinuten: "desc" },
+  });
+}
+
 export type NeuerSlot = {
   aerztinId: number;
   datum: string; // "YYYY-MM-DD"
