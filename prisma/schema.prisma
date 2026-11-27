@@ -1,5 +1,5 @@
 // Prisma 7 Schema. Die Verbindungs-URL steht in prisma.config.ts.
-// Datenmodell (Entitaeten aus SPEC.md) entsteht mit dem ersten Feature (F-001).
+// Modelle entstehen Feature fuer Feature (siehe docs/backlog.md).
 
 generator client {
   provider = "prisma-client"
@@ -8,4 +8,66 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+}
+
+// --- F-001 Terminplan und Slots pflegen (BR6, BR7) ---
+
+enum Halbtag {
+  VORMITTAG
+  NACHMITTAG
+}
+
+enum SlotArt {
+  NORMAL
+  AKUT
+}
+
+enum SlotStatus {
+  FREI
+  BELEGT
+}
+
+model Aerztin {
+  id           Int                @id @default(autoincrement())
+  name         String
+  slots        Slot[]
+  terminarten  AerztinTerminart[]
+
+  @@map("aerztin")
+}
+
+model Terminart {
+  id           Int                @id @default(autoincrement())
+  bezeichnung  String             @unique
+  dauerMinuten Int
+  onlineBuchbar Boolean           @default(false)
+  aerztinnen   AerztinTerminart[]
+
+  @@map("terminart")
+}
+
+// n:m "Aerztin darf Terminart durchfuehren" (SPEC Beziehung 4).
+model AerztinTerminart {
+  aerztinId   Int
+  terminartId Int
+  aerztin     Aerztin   @relation(fields: [aerztinId], references: [id], onDelete: Cascade)
+  terminart   Terminart @relation(fields: [terminartId], references: [id], onDelete: Cascade)
+
+  @@id([aerztinId, terminartId])
+  @@map("aerztin_terminart")
+}
+
+model Slot {
+  id       Int        @id @default(autoincrement())
+  datum    DateTime
+  beginn   String     // Uhrzeit "HH:MM", Beginn des Slots
+  halbtag  Halbtag
+  art      SlotArt    @default(NORMAL)
+  status   SlotStatus @default(FREI)
+  aerztinId Int
+  aerztin  Aerztin    @relation(fields: [aerztinId], references: [id], onDelete: Cascade)
+
+  // Ein Slot je Aerztin, Tag und Uhrzeit (Grundlage fuer "ein Slot, ein Termin").
+  @@unique([aerztinId, datum, beginn])
+  @@map("slot")
 }

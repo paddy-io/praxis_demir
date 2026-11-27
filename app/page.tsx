@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+
 export default function Home() {
   return (
     <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-8 px-6 py-24">
@@ -12,12 +15,17 @@ export default function Home() {
         Feature für Feature, beginnend mit F-001 aus dem Backlog.
       </p>
       <div className="rounded-card border border-line bg-surface p-6 shadow-sm">
-        <h2 className="font-display text-xl font-semibold">Nächste Schritte</h2>
-        <ul className="mt-3 space-y-1 text-sm text-ink-muted">
-          <li>F-001 Terminplan und Slots pflegen</li>
-          <li>Datenmodell als Prisma-Migration anlegen</li>
-          <li>Designrichtung in docs/decisions.md festschreiben</li>
-        </ul>
+        <h2 className="font-display text-xl font-semibold">F-001 Terminplan</h2>
+        <p className="mt-2 text-sm text-ink-muted">
+          Terminarten ansehen und Slots für die Ärztinnen anlegen.
+        </p>
+        <Link
+          href="/plan"
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 font-medium text-white transition hover:opacity-90"
+        >
+          Zum Terminplan
+          <ArrowRight className="size-4" aria-hidden />
+        </Link>
       </div>
     </main>
   );

@@ -12,8 +12,10 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "node --test --import tsx tests/",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
+    "db:seed": "node --import tsx prisma/seed.ts",
     "db:studio": "prisma studio"
   },
   "dependencies": {
