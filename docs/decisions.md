@@ -349,3 +349,22 @@ Patient-Arzt-Bezug) gewünscht ist, wird das später ergänzt. Aktuell: jede
 anwesende Ärzt:in.
 
 **Nicht Teil von F-008:** E-Rezept-Anbindung, Druck/Versand, Rezeptgebühren.
+
+## 2026-11-27 - Fix: veralteter Prisma-Client im laufenden Dev-Server
+
+**Was:** `lib/prisma.ts` gibt `prisma` jetzt als Proxy aus. Bei jedem Zugriff wird
+geprüft, ob sich der generierte Client (`generated/prisma/client.ts`) geändert
+hat; ist das der Fall (und läuft die App in der Entwicklung), wird ein frischer
+Client erzeugt und der alte getrennt. Die reine Entscheidung liegt in
+`brauchtNeuenClient(...)` und ist in `tests/prisma.test.ts` getestet.
+
+**Warum:** Nach jeder `prisma migrate dev` schreibt Prisma den Client neu. Ein
+bereits laufender `next dev` merkte das nicht und hielt den alten Client im
+Speicher; ein neues Modell war zur Laufzeit `undefined` (Fehler
+`Cannot read properties of undefined (reading 'findMany')`). Das trat bei F-003,
+F-006, F-007 und F-008 auf. Mit dem Proxy lädt der Server den Client selbst neu,
+ohne Neustart.
+
+**Zusammenspiel mit dem `predev`-Hook:** Der Hook stellt sicher, dass vor jedem
+`npm run dev` ein aktueller Client existiert; der Proxy fängt Änderungen während
+eines laufenden Servers ab. Ein Neustart ist damit nicht mehr nötig.

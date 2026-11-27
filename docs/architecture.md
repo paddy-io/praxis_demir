@@ -74,11 +74,12 @@ meldet z. B. `Cannot read properties of undefined (reading 'findMany')`.
 
 Deshalb:
 
-- **Nach jeder Migration den Dev-Server neu starten** (`Strg+C`, dann `npm run dev`).
-- Der `predev`-Hook in `package.json` führt vor jedem `npm run dev` automatisch
-  `prisma generate` aus. Das fängt einen veralteten oder fehlenden Client ab –
-  ersetzt aber keinen Neustart, wenn der Server schon läuft.
-- Bei hartnäckigen Fällen zusätzlich `rm -rf .next`.
+- `lib/prisma.ts` gibt `prisma` als **Proxy** aus, der den Änderungszeitpunkt des
+  generierten Clients prüft und bei Bedarf einen frischen Client erzeugt. Ein
+  laufender Dev-Server lädt so automatisch nach; ein Neustart ist nicht nötig.
+- Der `predev`-Hook in `package.json` führt vor jedem `npm run dev` zusätzlich
+  `prisma generate` aus, damit überhaupt ein aktueller Client vorliegt.
+- Bei hartnäckigen Fällen (z. B. Turbopack-Cache) hilft `rm -rf .next`.
 
 ## Offene Punkte
 

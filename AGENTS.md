@@ -12,7 +12,7 @@ Web-App zur Online-Terminbuchung für die Praxis Demir & Kollegen (Berlin-Weddin
 - Datenbank: SQLite über Prisma 7 (lokale Datei, kein Server). Installieren mit `npm install prisma@7 @prisma/client@7`, keine Vorabversion.
 - UI: Tailwind CSS, Gestaltung siehe Abschnitt „Design“
 - Start: `npm run dev` (führt vorher automatisch `prisma generate` aus), danach http://localhost:3000
-- Nach jeder Prisma-Migration den Dev-Server neu starten (`Strg+C`, dann `npm run dev`), sonst kennt der laufende Prozess das neue Modell nicht.
+- Nach einer Prisma-Migration lädt der Dev-Server den Client selbst neu (Proxy in `lib/prisma.ts`); der `predev`-Hook erzeugt ihn zusätzlich vor jedem Start. Bei Problemen hilft `rm -rf .next`.
 
 ## Design
 
