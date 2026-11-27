@@ -113,6 +113,7 @@ model Patient {
   status               PatientStatus    @default(BESTAND)
   onlineBuchungGesperrt Boolean         @default(false)
   termine              Termin[]
+  einwilligungen       Einwilligung[]
 
   @@map("patient")
 }
@@ -164,4 +165,25 @@ model Abwesenheit {
   erfasstAm      DateTime        @default(now())
 
   @@map("abwesenheit")
+}
+
+// --- F-004 Einwilligung (Opt-in) verwalten (BR9) ---
+
+enum EinwilligungsKanal {
+  SMS
+  EMAIL
+}
+
+// Je Patient:in und Kanal hoechstens ein Eintrag (SPEC Beziehung 11). Der
+// Widerruf setzt widerrufenAm, der Eintrag bleibt fuer den Verlauf bestehen.
+model Einwilligung {
+  id           Int               @id @default(autoincrement())
+  patientId    Int
+  kanal        EinwilligungsKanal
+  erteiltAm    DateTime          @default(now())
+  widerrufenAm DateTime?
+  patient      Patient           @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  @@unique([patientId, kanal])
+  @@map("einwilligung")
 }

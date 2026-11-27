@@ -139,3 +139,41 @@ export function pruefeAbwesenheit(abwesenheit: {
   }
   return { ok: true };
 }
+
+// --- BR9 Einwilligung (Opt-in) vor jedem Versand (SPEC 4) ---
+// Standardmaessig wird nichts verschickt. SMS und E-Mail nur mit ausdruecklicher
+// Zustimmung, getrennt je Kanal und widerrufbar. Ohne aktive Einwilligung kein
+// Versand; ein fehlender Eintrag bedeutet keine Zustimmung.
+
+export type EinwilligungsKanal = "SMS" | "EMAIL";
+
+export type EinwilligungsEintrag = {
+  kanal: EinwilligungsKanal;
+  erteiltAm: Date;
+  widerrufenAm: Date | null;
+};
+
+// Aktiv = erteilt und nicht widerrufen.
+export function istEinwilligungAktiv(einwilligung: EinwilligungsEintrag): boolean {
+  return einwilligung.widerrufenAm == null;
+}
+
+// BR9: darf an diese Person ueber diesen Kanal verschickt werden?
+export function darfVersenden(
+  kanal: EinwilligungsKanal,
+  einwilligungen: EinwilligungsEintrag[],
+): boolean {
+  const eintrag = einwilligungen.find((e) => e.kanal === kanal);
+  if (!eintrag) return false;
+  return istEinwilligungAktiv(eintrag);
+}
+
+// Der Versand-Hinweis, den die Oberflaeche anzeigen kann.
+export function versandHinweis(
+  kanal: EinwilligungsKanal,
+  einwilligungen: EinwilligungsEintrag[],
+): string {
+  return darfVersenden(kanal, einwilligungen)
+    ? `${kanal === "EMAIL" ? "E-Mail" : "SMS"} erlaubt`
+    : `kein Opt-in für ${kanal === "EMAIL" ? "E-Mail" : "SMS"}`;
+}

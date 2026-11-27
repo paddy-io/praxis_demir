@@ -48,6 +48,14 @@ export function SiteFooter() {
                 Abwesenheit
               </Link>
             </li>
+            <li>
+              <Link
+                href="/einwilligungen"
+                className="text-ink transition hover:text-accent"
+              >
+                Einwilligungen
+              </Link>
+            </li>
           </ul>
         </div>
 

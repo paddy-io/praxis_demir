@@ -15,7 +15,7 @@ Ein Feature ist ein Ablauf, den eine Person von Anfang bis Ende durchspielen kan
 | F-001 | Terminplan und Slots pflegen (Ärzt:innen, Terminarten, Slots je Halbtag) | 1 | fertig | BR6, BR7 - Ärztin, Terminart, Slot |
 | F-002 | Online-Termin buchen (Identifikation und Slot-Sperre im Moment der Buchung) | 1 | fertig | BR5, BR6, BR9 - Patient, Termin, Slot, Terminart, Ärztin |
 | F-003 | Abwesenheit und Praxisschliessung pflegen, betroffene Termine anzeigen | 1 | fertig | BR4 - Abwesenheit, Slot, Termin, Ärztin |
-| F-004 | Einwilligung (Opt-in) verwalten und vor jedem Versand prüfen | 1 | offen | BR9 - Einwilligung, Patient |
+| F-004 | Einwilligung (Opt-in) verwalten und vor jedem Versand prüfen | 1 | fertig | BR9 - Einwilligung, Patient |
 | F-005 | Termin erfassen, ändern und absagen (Telefon und Tresen) | 1 | offen | BR5, BR7 - Termin, Slot, MFA, Patient |
 
 ## Phase 2

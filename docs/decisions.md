@@ -191,3 +191,32 @@ Praxisschließung inklusive Anzeige betroffener Termine (BR4).
 
 **Nicht Teil von F-003:** automatisches Umbuchen (Out of Scope), Opt-in-Versand
 der Benachrichtigung (F-004), Akut-Kontingent (F-006).
+
+## 2026-11-27 - F-004 umgesetzt
+
+**Was:** F-004 „Einwilligung (Opt-in) verwalten und vor jedem Versand prüfen" ist
+gebaut. Neues Modell `Einwilligung` (`patientId`, `kanal`, `erteiltAm`,
+`widerrufenAm`) mit `@@unique([patientId, kanal])`, Enum `EinwilligungsKanal`
+(`SMS`, `EMAIL`), Migration `f004_einwilligung`. Reine Regeln in `lib/rules.ts`
+(`istEinwilligungAktiv`, `darfVersenden`, `versandHinweis`), Abläufe in
+`lib/einwilligung.ts` (`erteileEinwilligung`, `widerrufeEinwilligung`,
+`pruefeVersand`, `findePatient`), Seite `/einwilligungen`. Tests in
+`tests/einwilligung.test.ts` und `tests/einwilligung.integration.test.ts`.
+
+**Warum:** Viertes Feature aus Phase 1. v1 verlangt die Opt-in-Prüfung vor jedem
+Versand (BR9).
+
+**Entscheidungen:**
+- Je Patient:in und Kanal genau ein Eintrag (SPEC Beziehung 11: „1:n, je Kanal
+  eine"). Die Eindeutigkeit erzwingt das auf Datenbank-Ebene.
+- Ein Widerruf setzt `widerrufenAm`, der Eintrag bleibt für den Verlauf bestehen.
+  Erneutes Erteilen hebt den Widerruf wieder auf (Annahme aus SPEC §7: Opt-in je
+  Kanal und widerrufbar).
+- Ohne Eintrag gilt die Einwilligung als nicht erteilt. `pruefeVersand` ist die
+  zentrale Funktion, die spätere Features (z. B. F-007 Erinnerung, Kontakt bei
+  Abwesenheit) vor jedem Versand aufrufen.
+- Beim Buchen wird nichts verschickt, daher ändert F-004 den Buchungsablauf nicht
+  (BR9: standardmäßig keine E-Mail).
+
+**Nicht Teil von F-004:** der tatsächliche Versand (E-Mail/Brief) und die
+Erinnerung selbst. F-004 liefert nur die Verwaltung und die Prüffunktion.
