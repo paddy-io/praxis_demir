@@ -282,3 +282,37 @@ gab es schon aus F-001, sie waren aber nirgends angeschlossen.
 
 **Nicht Teil von F-006:** Nachtrag/„nachtraeglich erfasst" bei Kulanz (F-010),
 automatisches Umbuchen (Out of Scope), Online-Buchung von Akut (Out of Scope).
+
+## 2026-11-27 - F-007 umgesetzt
+
+**Was:** F-007 „No-Show erfassen, rollierend zählen, erinnern und Online-Sperre
+setzen/heben" ist gebaut. `Termin` bekommt `noShowAm` und `triftigerGrund`, neues
+Modell `Erinnerung` (Aufgabe für die MFA) mit Enum `ErinnerungsKanal`
+(`EMAIL`, `BRIEF`, `ANRUF`), Migration `f007_noshow`. Regeln in `lib/rules.ts`
+(`fensterBeginn`, `zaehleNoShows`, `noShowEskalation`, `erinnerungsKanal`),
+Abläufe in `lib/noshow.ts` (`erfasseNoShow`, `getNoShowUebersicht`,
+`setzeOnlineSperre`, `hebeOnlineSperre`, `getOffeneErinnerungen`,
+`erledigeErinnerung`), Seite `/noshow`. Tests in `tests/noshow.test.ts` und
+`tests/noshow.integration.test.ts`.
+
+**Warum:** BR2 verlangt automatisches Zählen im rollierenden 12-Monats-Fenster,
+eine Erinnerung nach dem zweiten und eine Online-Sperre nach dem dritten No-Show.
+Im Backlog als Phase-2-Feature geführt.
+
+**Entscheidungen:**
+- Das Fenster ist rollierend (heute minus 12 Monate bis heute), nicht das
+  Kalenderjahr, wie in BR2 gefordert.
+- Ein triftiger Grund (`Termin.triftigerGrund`) lässt den Fall nicht mitzählen;
+  die MFA trägt ihn beim Erfassen ein.
+- Die Sperre greift nicht vollautomatisch: Die App macht sie nur „fällig", gesetzt
+  und gehoben wird sie ausschließlich durch die MFA (SPEC §7, keine feste Frist).
+- Die Erinnerung ist eine Aufgabe für die MFA (SPEC §7). Der Kanal richtet sich
+  nach dem Opt-in: E-Mail nur mit Zustimmung, sonst Brief. Die Prüfung nutzt die
+  bestehende Funktion `pruefeVersand` aus F-004. Die App erzeugt keinen Brief.
+- Keine No-Show-Gebühr und keine Rechnungsstellung (Out of Scope, M1-5); die App
+  zählt, erinnert und sperrt nur.
+
+**Hinweis:** BR2 stand in der SPEC als „v1 oder später, noch zu entscheiden". Wie
+im Backlog vorgesehen, ist es als F-007 in Phase 2 umgesetzt.
+
+**Nicht Teil von F-007:** automatisches Sperren ohne MFA, tatsächlicher Briefdruck.

@@ -23,7 +23,7 @@ Ein Feature ist ein Ablauf, den eine Person von Anfang bis Ende durchspielen kan
 | ID | Name | Phase | Status | BR/Entitäten |
 |---|---|---|---|---|
 | F-006 | Akut-Kontingent je Halbtag führen und "keine Akutslots frei" anzeigen | 2 | fertig | BR1 - Slot, Termin |
-| F-007 | No-Show erfassen, rollierend zählen, erinnern und Online-Sperre setzen/heben | 2 | offen | BR2 - Termin, Patient, MFA, Einwilligung |
+| F-007 | No-Show erfassen, rollierend zählen, erinnern und Online-Sperre setzen/heben | 2 | fertig | BR2 - Termin, Patient, MFA, Einwilligung |
 | F-008 | Rezeptantrag anlegen und durch eine Ärzt:in freigeben | 2 | offen | BR3 - Rezeptantrag, MFA, Ärztin |
 | F-009 | Erstgespräch telefonisch vorklären und Termin vergeben | 2 | offen | BR6, BR8 - Termin, MFA, Ärztin |
 | F-010 | Nachtrag erfassen und als "nachtraeglich erfasst" kennzeichnen (informelle Kulanz) | 2 | offen | BR1 - Termin |
@@ -39,5 +39,5 @@ Ein Feature ist ein Ablauf, den eine Person von Anfang bis Ende durchspielen kan
 
 ## Offene Entscheidungen
 
-- BR2 (No-Show-Eskalation und Sperre): v1 oder später, laut SPEC noch zu entscheiden. Aktuell als F-007 in Phase 2 geführt.
+- BR2 (No-Show-Eskalation und Sperre): laut SPEC noch zu entscheiden, ob v1 oder später. Mit F-007 in Phase 2 umgesetzt; die Kundin sollte bestätigen, dass die Sperre in dieser Ausbaustufe gewünscht ist.
 - Offene Fragen und Annahmen aus `SPEC.md` Abschnitt 7 fliessen beim Bauen in das jeweilige Feature ein.

@@ -114,6 +114,7 @@ model Patient {
   onlineBuchungGesperrt Boolean         @default(false)
   termine              Termin[]
   einwilligungen       Einwilligung[]
+  erinnerungen         Erinnerung[]
 
   @@map("patient")
 }
@@ -124,6 +125,10 @@ model Termin {
   kanal                TerminKanal    @default(ONLINE)
   nachtraeglichErfasst Boolean        @default(false)
   dringlichkeit        String?
+  // BR2: Datum des No-Shows und ein triftiger Grund, der den Zaehler nicht
+  // erhoeht (MFA-Ermessen).
+  noShowAm             DateTime?
+  triftigerGrund       String?
   patientId            Int
   aerztinId            Int
   terminartId          Int
@@ -138,6 +143,7 @@ model Termin {
   terminart            Terminart      @relation(fields: [terminartId], references: [id])
   slot                 Slot           @relation(fields: [slotId], references: [id])
   erfasstVon           MFA?           @relation(fields: [erfasstVonId], references: [id])
+  erinnerungen         Erinnerung[]
 
   @@map("termin")
 }
@@ -213,4 +219,28 @@ model PraxisEinstellung {
   akutKontingentProHalbtag Int @default(2)
 
   @@map("praxis_einstellung")
+}
+
+// --- F-007 No-Show erfassen, zaehlen, erinnern und sperren (BR2) ---
+
+enum ErinnerungsKanal {
+  EMAIL
+  BRIEF
+  ANRUF
+}
+
+// Aufgabe fuer die MFA: schriftliche Erinnerung nach dem zweiten No-Show. Der
+// Versand selbst ist eine MFA-Aufgabe (SPEC §7), die App legt nur die Aufgabe an.
+model Erinnerung {
+  id          Int              @id @default(autoincrement())
+  patientId   Int
+  terminId    Int?
+  kanal       ErinnerungsKanal
+  ausgeloestAm DateTime        @default(now())
+  erledigtAm  DateTime?
+  notiz       String?
+  patient     Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  termin      Termin?          @relation(fields: [terminId], references: [id])
+
+  @@map("erinnerung")
 }

@@ -10,6 +10,7 @@ const nav = [
   { href: "/plan", label: "Terminplan" },
   { href: "/termine", label: "Termine" },
   { href: "/abwesenheit", label: "Abwesenheit" },
+  { href: "/noshow", label: "No-Show" },
   { href: "/einwilligungen", label: "Einwilligungen" },
 ];
 

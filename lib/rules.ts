@@ -228,3 +228,76 @@ export function terminAenderbar(status: string): boolean {
 export function terminAbsagbar(status: string): boolean {
   return (AENDERBAR as readonly string[]).includes(status);
 }
+
+// --- BR2 No-Show: rollierendes Fenster, Eskalation, Erinnerung (SPEC 4) ---
+// Gezaehlt wird immer in den letzten 12 Monaten ab heute (nicht Kalenderjahr).
+// Der zweite No-Show loest eine Erinnerung aus, der dritte die Sperre. Beides
+// setzt die MFA um; die App schlaegt nur vor.
+
+export const NOSHOW_FENSTER_MONATE = 12;
+
+export type NoShowEintrag = {
+  status: string;
+  noShowAm: Date | null;
+  triftigerGrund: string | null;
+};
+
+// Anfang des rollierenden Fensters: heute minus 12 Monate.
+export function fensterBeginn(heute: Date, monate = NOSHOW_FENSTER_MONATE): Date {
+  const start = new Date(heute);
+  start.setMonth(start.getMonth() - monate);
+  return start;
+}
+
+// Zaehlt No-Shows ohne triftigen Grund im rollierenden Fenster.
+export function zaehleNoShows(termine: NoShowEintrag[], heute: Date): number {
+  const start = fensterBeginn(heute);
+  return termine.filter((termin) => {
+    if (termin.status !== "NO_SHOW") return false;
+    if (termin.triftigerGrund) return false;
+    if (!termin.noShowAm) return false;
+    return termin.noShowAm >= start && termin.noShowAm <= heute;
+  }).length;
+}
+
+export type NoShowEskalation = {
+  anzahl: number;
+  stufe: 0 | 1 | 2 | 3;
+  hinweis: string;
+  erinnerungFaellig: boolean;
+  sperreFaellig: boolean;
+};
+
+export function noShowEskalation(anzahl: number): NoShowEskalation {
+  if (anzahl >= 3) {
+    return {
+      anzahl,
+      stufe: 3,
+      hinweis: "Online-Buchung sperren",
+      erinnerungFaellig: false,
+      sperreFaellig: true,
+    };
+  }
+  if (anzahl === 2) {
+    return {
+      anzahl,
+      stufe: 2,
+      hinweis: "Schriftliche Erinnerung",
+      erinnerungFaellig: true,
+      sperreFaellig: false,
+    };
+  }
+  return {
+    anzahl,
+    stufe: anzahl === 1 ? 1 : 0,
+    hinweis: "keine Maßnahme",
+    erinnerungFaellig: false,
+    sperreFaellig: false,
+  };
+}
+
+// BR2: Die schriftliche Erinnerung geht per E-Mail nur mit Opt-in, sonst per
+// Brief (Post) oder Anruf (SPEC §7: Aufgabe fuer die MFA).
+export function erinnerungsKanal(emailOptin: boolean): "EMAIL" | "BRIEF" {
+  return emailOptin ? "EMAIL" : "BRIEF";
+}

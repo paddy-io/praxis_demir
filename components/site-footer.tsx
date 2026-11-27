@@ -54,6 +54,11 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
+              <Link href="/noshow" className="text-ink transition hover:text-accent">
+                No-Show
+              </Link>
+            </li>
+            <li>
               <Link
                 href="/einwilligungen"
                 className="text-ink transition hover:text-accent"
