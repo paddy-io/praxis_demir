@@ -56,13 +56,29 @@ Festlegung erfolgt mit dem ersten Feature in `docs/decisions.md` (Vorgabe aus
 | Befehl | Zweck |
 |---|---|
 | `npm install` | Abhängigkeiten installieren |
-| `npm run dev` | Entwicklungsserver, http://localhost:3000 |
+| `npm run dev` | Entwicklungsserver, http://localhost:3000 (führt vorher automatisch `prisma generate` aus) |
 | `npm run build` | Produktions-Build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | TypeScript ohne Ausgabe |
 | `npx prisma migrate dev --name <name>` | Migration erzeugen und anwenden |
 | `npx prisma generate` | Prisma-Client erzeugen |
 | `npx prisma studio` | Datenbank im Browser ansehen |
+
+## Prisma-Client und laufender Dev-Server
+
+`prisma migrate dev` und `prisma generate` schreiben den Prisma-Client nach
+`generated/prisma/`. Ein **bereits laufender** `next dev`-Prozess merkt das nicht:
+Er hält den alten Client im Speicher (zusätzlich gecacht in `globalThis` über
+`lib/prisma.ts`). Ein neues Modell ist dann zur Laufzeit `undefined`, und die App
+meldet z. B. `Cannot read properties of undefined (reading 'findMany')`.
+
+Deshalb:
+
+- **Nach jeder Migration den Dev-Server neu starten** (`Strg+C`, dann `npm run dev`).
+- Der `predev`-Hook in `package.json` führt vor jedem `npm run dev` automatisch
+  `prisma generate` aus. Das fängt einen veralteten oder fehlenden Client ab –
+  ersetzt aber keinen Neustart, wenn der Server schon läuft.
+- Bei hartnäckigen Fällen zusätzlich `rm -rf .next`.
 
 ## Offene Punkte
 

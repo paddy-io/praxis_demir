@@ -11,7 +11,8 @@ Web-App zur Online-Terminbuchung für die Praxis Demir & Kollegen (Berlin-Weddin
 - Framework: Next.js (App Router, TypeScript)
 - Datenbank: SQLite über Prisma 7 (lokale Datei, kein Server). Installieren mit `npm install prisma@7 @prisma/client@7`, keine Vorabversion.
 - UI: Tailwind CSS, Gestaltung siehe Abschnitt „Design“
-- Start: `npm run dev`, danach http://localhost:3000
+- Start: `npm run dev` (führt vorher automatisch `prisma generate` aus), danach http://localhost:3000
+- Nach jeder Prisma-Migration den Dev-Server neu starten (`Strg+C`, dann `npm run dev`), sonst kennt der laufende Prozess das neue Modell nicht.
 
 ## Design
 
