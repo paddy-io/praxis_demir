@@ -140,3 +140,25 @@ wurden bewusst weggelassen. Nur belegte Fakten verwendet.
 21/21 grün, Typecheck und Lint sauber.
 
 **Noch offen (Design):** Aufwertung von `/buchen` und `/plan` (Schritt 4).
+
+## 2026-11-27 - Design-Durchgang: Buchen und Terminplan aufgewertet
+
+**Was:** Schritt 4 des Design-Durchgangs, Oberfläche von `/buchen` und `/plan`.
+
+- `/buchen`: Kopfbereich mit Telefon-Hinweis als Pille. Das Formular nutzt jetzt
+  echte „Schritt 1/2/3"-Karten mit Icon-Badge und `sr-only`-Legenden, weichere
+  Karten, sanften Fokusring, Pflichtfeld-Sternchen, voll breiten grünen Button auf
+  Mobil und eine Bestätigungskarte mit Hinweis auf die Versichertenkarte. Fehler
+  als Alert mit Icon.
+- `/plan`: drei klar beschriftete Abschnitte (Terminarten / Neuen Slot anlegen /
+  Geplante Slots) mit Icon-Köpfen und kurzen Beschreibungen. Tabelle mit luftigeren
+  Zeilen, `overflow-x-auto` für schmale Bildschirme, sanftem Hover und
+  Status-Badges als Pillen. Slot-Formular mit Fehler- und Erfolgsmeldung samt Icon.
+
+**Warum:** Fortsetzung der Richtung „ruhig und editorial". Einheitliche Karten,
+Abstände und Zustände über alle Seiten.
+
+**Keine Logikänderung:** `actions.ts`, `lib/*` und das Datenmodell sind unverändert.
+`npm test` bleibt bei 21/21 grün, Typecheck und Lint sauber.
+
+**Damit abgeschlossen:** Der Design-Durchgang (Schritte 1–4) ist fertig.
