@@ -316,3 +316,36 @@ Im Backlog als Phase-2-Feature geführt.
 im Backlog vorgesehen, ist es als F-007 in Phase 2 umgesetzt.
 
 **Nicht Teil von F-007:** automatisches Sperren ohne MFA, tatsächlicher Briefdruck.
+
+## 2026-11-27 - F-008 umgesetzt
+
+**Was:** F-008 „Rezeptantrag anlegen und durch eine Ärzt:in freigeben" ist gebaut.
+Neues Modell `Rezeptantrag` (`patientId`, `angelegtVonId`, `freigegebenVonId`,
+`status`, `datum`, `freigegebenAm`, `notiz`), Enum `RezeptStatus`
+(`ANGELEGT`, `FREIGEGEBEN`), Migration `f008_rezeptantrag`. Regeln in
+`lib/rules.ts` (`darfRezeptantragAnlegen`, `darfRezeptFreigeben`,
+`aerztinAbwesend`), Abläufe in `lib/rezept.ts` (`legeRezeptantragAn`,
+`gibRezeptFrei`, `getRezeptantraege`), Seite `/rezepte`. Tests in
+`tests/rezept.test.ts` und `tests/rezept.integration.test.ts`.
+
+**Warum:** BR3 verlangt, dass die MFA den Wiederholungsrezept-Antrag anlegt und
+nur eine Ärzt:in ihn freigibt (Arztvorbehalt). Im Backlog als Phase-2-Feature.
+
+**Entscheidungen:**
+- Die SPEC lässt die Zuständigkeit offen („wer ist gerade zuständig?", §7).
+  Deshalb gibt es keine feste Patient-Arzt-Zuordnung: Jede anwesende Ärzt:in darf
+  freigeben. So ist „bei Abwesenheit gibt eine Kollegin oder ein Kollege frei"
+  sauber abgedeckt, ohne einen Bezug zu erfinden.
+- Die Abwesenheitsprüfung nutzt die bestehende Regel aus F-003. Eine
+  Praxisschließung sperrt die Freigabe für alle; eine Ärztin-Abwesenheit nur für
+  die betroffene Ärztin.
+- Freigeben darf nur die Rolle `AERZTIN` (`darfRezeptFreigeben`); Anlegen nur die
+  Rolle `MFA` (`darfRezeptantragAnlegen`). Ein bereits freigegebener Antrag kann
+  nicht erneut freigegeben werden.
+- Die Notiz ist freiwillig und dient z. B. Medikament und Dosierung.
+
+**Offene Frage an die Kundin:** Falls eine feste Zuständigkeit (fester
+Patient-Arzt-Bezug) gewünscht ist, wird das später ergänzt. Aktuell: jede
+anwesende Ärzt:in.
+
+**Nicht Teil von F-008:** E-Rezept-Anbindung, Druck/Versand, Rezeptgebühren.

@@ -34,6 +34,7 @@ model Aerztin {
   terminarten  AerztinTerminart[]
   termine      Termin[]
   abwesenheiten Abwesenheit[]
+  rezepteFreigegeben Rezeptantrag[] @relation("RezeptFreigegeben")
 
   @@map("aerztin")
 }
@@ -115,6 +116,7 @@ model Patient {
   termine              Termin[]
   einwilligungen       Einwilligung[]
   erinnerungen         Erinnerung[]
+  rezeptantraege       Rezeptantrag[]
 
   @@map("patient")
 }
@@ -205,6 +207,7 @@ model MFA {
   id      Int      @id @default(autoincrement())
   name    String
   termine Termin[]
+  rezepte Rezeptantrag[] @relation("RezeptAngelegt")
 
   @@map("mfa")
 }
@@ -243,4 +246,29 @@ model Erinnerung {
   termin      Termin?          @relation(fields: [terminId], references: [id])
 
   @@map("erinnerung")
+}
+
+// --- F-008 Rezeptantrag anlegen und freigeben (BR3) ---
+
+enum RezeptStatus {
+  ANGELEGT
+  FREIGEGEBEN
+}
+
+// Die MFA legt den Wiederholungsrezept-Antrag an, nur eine Aerzt:in gibt ihn
+// frei (Arztvorbehalt). SPEC Beziehungen 8-10.
+model Rezeptantrag {
+  id              Int          @id @default(autoincrement())
+  patientId       Int
+  angelegtVonId   Int
+  freigegebenVonId Int?
+  status          RezeptStatus @default(ANGELEGT)
+  datum           DateTime     @default(now())
+  freigegebenAm   DateTime?
+  notiz           String?
+  patient         Patient      @relation(fields: [patientId], references: [id])
+  angelegtVon     MFA          @relation("RezeptAngelegt", fields: [angelegtVonId], references: [id])
+  freigegebenVon  Aerztin?     @relation("RezeptFreigegeben", fields: [freigegebenVonId], references: [id])
+
+  @@map("rezeptantrag")
 }

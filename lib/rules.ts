@@ -301,3 +301,26 @@ export function noShowEskalation(anzahl: number): NoShowEskalation {
 export function erinnerungsKanal(emailOptin: boolean): "EMAIL" | "BRIEF" {
   return emailOptin ? "EMAIL" : "BRIEF";
 }
+
+// --- BR3 Rezeptantrag: anlegen und freigeben (SPEC 4) ---
+// Die MFA legt den Wiederholungsrezept-Antrag an, nur eine Aerzt:in gibt ihn frei
+// (Arztvorbehalt, nicht verhandelbar). Bei Abwesenheit der zustaendigen Aerzt:in
+// gibt eine Kollegin oder ein Kollege frei. Die SPEC laesst die Zustaendigkeit
+// offen (SPEC §7), deshalb darf jede anwesende Aerzt:in freigeben.
+
+export function darfRezeptantragAnlegen(rolle: Rolle): boolean {
+  return rolle === "MFA";
+}
+
+export function darfRezeptFreigeben(rolle: Rolle): boolean {
+  return rolle === "AERZTIN";
+}
+
+// Ist die Aerzt:in an diesem Tag abwesend? Eine Praxisschliessung sperrt alle.
+export function aerztinAbwesend(
+  abwesenheiten: AbwesenheitsRegel[],
+  aerztinId: number,
+  tag: Date,
+): boolean {
+  return abwesenheitSperrtSlot(abwesenheiten, { datum: tag, aerztinId });
+}
