@@ -26,7 +26,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${inter.variable} ${fraunces.variable}`}>
-      <body>{children}</body>
+      {/* suppressHydrationWarning: Browser-Erweiterungen (z. B. Grammarly) setzen
+          eigene Attribute ins <body>, bevor React übernimmt. Das ist kein Fehler
+          der App; die Warnung wird hier bewusst nur für dieses Element stumm gestellt. */}
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

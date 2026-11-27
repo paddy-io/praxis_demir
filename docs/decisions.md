@@ -59,3 +59,12 @@ Oberfläche ergänzt.
 **Hinweis:** `next/font/google` lädt Fraunces und Inter zur Build-Zeit. Ohne
 Internet schlägt der Build fehl (in der Sandbox der Fall); mit Internet läuft er.
 Alternative bei Bedarf: Schriften selbst hosten (`next/font/local`).
+
+## 2026-11-27 - Hydration-Warnung durch Browser-Erweiterung
+
+**Was:** Am `<body>` in `app/layout.tsx` steht `suppressHydrationWarning`.
+
+**Warum:** Erweiterungen wie Grammarly schreiben eigene Attribute
+(`data-gr-ext-installed`, `data-new-gr-c-s-check-loaded`) ins `<body>`, bevor
+React übernimmt. Das erzeugt eine Hydration-Warnung, die nicht aus der App
+stammt. Die Unterdrückung gilt bewusst nur für dieses eine Element.
