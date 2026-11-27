@@ -40,6 +40,14 @@ export function SiteFooter() {
                 Terminplan
               </Link>
             </li>
+            <li>
+              <Link
+                href="/abwesenheit"
+                className="text-ink transition hover:text-accent"
+              >
+                Abwesenheit
+              </Link>
+            </li>
           </ul>
         </div>
 

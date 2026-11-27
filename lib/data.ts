@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { Halbtag, SlotArt } from "@/generated/prisma/enums";
+import { abwesenheitSperrtSlot } from "@/lib/rules";
 
 export function getTerminarten() {
   return prisma.terminart.findMany({ orderBy: { dauerMinuten: "desc" } });
@@ -23,20 +24,44 @@ export function getSlots() {
 
 // F-002: alle freien Slots mit den Terminarten, die die Aerztin durchfuehren darf.
 // Die Oberflaeche filtert damit nach der gewaehlten Terminart.
-export function getFreieOnlineSlots() {
-  return prisma.slot.findMany({
-    where: { status: "FREI", art: "NORMAL" },
-    orderBy: [{ datum: "asc" }, { beginn: "asc" }],
-    include: {
-      aerztin: { include: { terminarten: true } },
-    },
-  });
+// F-003: Slots, die in eine Abwesenheit oder Schliessung fallen, werden
+// ausgeblendet (BR4).
+export async function getFreieOnlineSlots() {
+  const [slots, abwesenheiten] = await Promise.all([
+    prisma.slot.findMany({
+      where: { status: "FREI", art: "NORMAL" },
+      orderBy: [{ datum: "asc" }, { beginn: "asc" }],
+      include: {
+        aerztin: { include: { terminarten: true } },
+      },
+    }),
+    prisma.abwesenheit.findMany(),
+  ]);
+
+  return slots.filter((slot) => !abwesenheitSperrtSlot(abwesenheiten, slot));
 }
 
 export function getOnlineTerminarten() {
   return prisma.terminart.findMany({
     where: { onlineBuchbar: true },
     orderBy: { dauerMinuten: "desc" },
+  });
+}
+
+// --- F-003 Abwesenheit ---
+
+export function getAbwesenheiten() {
+  return prisma.abwesenheit.findMany({
+    orderBy: [{ von: "asc" }],
+    include: { aerztin: true },
+  });
+}
+
+export function getBetroffeneTermine() {
+  return prisma.termin.findMany({
+    where: { status: "BETROFFEN" },
+    orderBy: [{ slot: { datum: "asc" } }],
+    include: { slot: true, aerztin: true, patient: true, terminart: true },
   });
 }
 

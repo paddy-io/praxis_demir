@@ -1,6 +1,17 @@
-import { BadgeCheck, CalendarClock, CalendarPlus, ListChecks } from "lucide-react";
-import { getAerztinnen, getSlots, getTerminarten } from "@/lib/data";
-import { istOnlineBuchbar } from "@/lib/rules";
+import {
+  BadgeCheck,
+  CalendarClock,
+  CalendarPlus,
+  ListChecks,
+  Lock,
+} from "lucide-react";
+import {
+  getAbwesenheiten,
+  getAerztinnen,
+  getSlots,
+  getTerminarten,
+} from "@/lib/data";
+import { abwesenheitSperrtSlot, istOnlineBuchbar } from "@/lib/rules";
 import { SlotForm } from "./slot-form";
 
 export const dynamic = "force-dynamic";
@@ -43,10 +54,11 @@ function Abschnitt({
 }
 
 export default async function PlanPage() {
-  const [terminarten, aerztinnen, slots] = await Promise.all([
+  const [terminarten, aerztinnen, slots, abwesenheiten] = await Promise.all([
     getTerminarten(),
     getAerztinnen(),
     getSlots(),
+    getAbwesenheiten(),
   ]);
 
   return (
@@ -151,7 +163,12 @@ export default async function PlanPage() {
                       {slot.art === "AKUT" ? "Akut" : "Normal"}
                     </td>
                     <td className="px-5 py-4 text-right">
-                      {slot.status === "FREI" ? (
+                      {abwesenheitSperrtSlot(abwesenheiten, slot) ? (
+                        <span className="inline-flex items-center gap-1 rounded-pill bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800">
+                          <Lock className="size-3.5" aria-hidden />
+                          gesperrt
+                        </span>
+                      ) : slot.status === "FREI" ? (
                         <span className="inline-flex items-center gap-1 rounded-pill bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent">
                           <BadgeCheck className="size-3.5" aria-hidden />
                           frei

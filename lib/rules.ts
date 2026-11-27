@@ -55,3 +55,87 @@ export function akutHinweis(
     ? "Akutslots frei"
     : "keine Akutslots frei";
 }
+
+// --- BR4 Abwesenheit und Praxisschliessung (SPEC 4) ---
+// Eine Abwesenheit sperrt nur die Slots der betroffenen Aerzt:in. Eine
+// Praxisschliessung sperrt alle Slots des Tages. Die Pruefung ist taggenau und
+// bewusst ohne Datenbank, damit sie testbar bleibt.
+
+export type AbwesenheitsRegel = {
+  von: Date;
+  bis: Date;
+  geltungsbereich: "AERZTIN" | "PRAXIS";
+  aerztinId: number | null;
+};
+
+export type SlotBezug = {
+  datum: Date;
+  aerztinId: number;
+};
+
+// Taggenau: eine Abwesenheit deckt alle Tage von `von` bis `bis` (inklusive) ab.
+function tagImZeitraum(tag: Date, von: Date, bis: Date): boolean {
+  const t = new Date(tag).setHours(0, 0, 0, 0);
+  const a = new Date(von).setHours(0, 0, 0, 0);
+  const b = new Date(bis).setHours(0, 0, 0, 0);
+  return t >= a && t <= b;
+}
+
+export function abwesenheitSperrtSlot(
+  abwesenheiten: AbwesenheitsRegel[],
+  slot: SlotBezug,
+): boolean {
+  return abwesenheiten.some((abwesenheit) => {
+    if (!tagImZeitraum(slot.datum, abwesenheit.von, abwesenheit.bis)) {
+      return false;
+    }
+    if (abwesenheit.geltungsbereich === "PRAXIS") {
+      return true;
+    }
+    return abwesenheit.aerztinId === slot.aerztinId;
+  });
+}
+
+export function findeBetroffeneSlots<T extends SlotBezug>(
+  abwesenheiten: AbwesenheitsRegel[],
+  slots: T[],
+): T[] {
+  return slots.filter((slot) => abwesenheitSperrtSlot(abwesenheiten, slot));
+}
+
+export type TerminBezug = {
+  slot: SlotBezug;
+};
+
+export function findeBetroffeneTermine<T extends TerminBezug>(
+  abwesenheiten: AbwesenheitsRegel[],
+  termine: T[],
+): T[] {
+  return termine.filter((termin) => abwesenheitSperrtSlot(abwesenheiten, termin.slot));
+}
+
+// Geltungsbereich und aerztinId muessen zusammenpassen: eine Praxisschliessung
+// hat keine Aerzt:in, eine Aerzt:in-Abwesenheit braucht eine.
+export function pruefeAbwesenheit(abwesenheit: {
+  von: Date;
+  bis: Date;
+  geltungsbereich: "AERZTIN" | "PRAXIS";
+  aerztinId: number | null;
+}): { ok: true } | { ok: false; grund: string } {
+  if (abwesenheit.bis < abwesenheit.von) {
+    return { ok: false, grund: "Das Ende darf nicht vor dem Beginn liegen." };
+  }
+  if (abwesenheit.geltungsbereich === "PRAXIS" && abwesenheit.aerztinId != null) {
+    return {
+      ok: false,
+      grund: "Eine Praxisschließung gilt für alle und hat keine einzelne Ärztin.",
+    };
+  }
+  if (abwesenheit.geltungsbereich === "AERZTIN" && abwesenheit.aerztinId == null) {
+    return {
+      ok: false,
+      grund: "Für eine Abwesenheit einer Ärztin muss eine Ärztin gewählt werden.",
+    };
+  }
+  return { ok: true };
+}

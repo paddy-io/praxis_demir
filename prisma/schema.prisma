@@ -33,6 +33,7 @@ model Aerztin {
   slots        Slot[]
   terminarten  AerztinTerminart[]
   termine      Termin[]
+  abwesenheiten Abwesenheit[]
 
   @@map("aerztin")
 }
@@ -134,4 +135,33 @@ model Termin {
   slot                 Slot           @relation(fields: [slotId], references: [id])
 
   @@map("termin")
+}
+
+// --- F-003 Abwesenheit und Praxisschliessung (BR4) ---
+
+enum Geltungsbereich {
+  AERZTIN
+  PRAXIS
+}
+
+enum AbwesenheitArt {
+  URLAUB
+  BRUECKENTAG
+  FORTBILDUNG
+}
+
+// Eine Abwesenheit sperrt entweder nur die Slots einer Aerzt:in oder (als
+// Praxisschliessung) alle Slots des Tages. SPEC Beziehung 7: leerer aerztinId
+// bedeutet Praxisschliessung.
+model Abwesenheit {
+  id             Int             @id @default(autoincrement())
+  von            DateTime
+  bis            DateTime
+  geltungsbereich Geltungsbereich
+  art            AbwesenheitArt
+  aerztinId      Int?
+  aerztin        Aerztin?        @relation(fields: [aerztinId], references: [id], onDelete: Cascade)
+  erfasstAm      DateTime        @default(now())
+
+  @@map("abwesenheit")
 }

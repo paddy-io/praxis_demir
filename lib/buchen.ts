@@ -4,6 +4,7 @@
 
 import type { PrismaClient } from "@/generated/prisma/client";
 import { pruefeBuchung, pruefeIdentifikation } from "./booking.ts";
+import { abwesenheitSperrtSlot } from "./rules.ts";
 
 export type BuchungsWunsch = {
   // Eindeutige Identifikation (BR9): je nach Versicherungsart eine der Nummern.
@@ -39,6 +40,15 @@ export async function bucheOnlineTermin(
   });
   if (!slot) {
     return { ok: false, grund: "Dieser Slot existiert nicht mehr." };
+  }
+
+  // BR4: Eine hinterlegte Abwesenheit oder Praxisschliessung sperrt den Slot.
+  const abwesenheiten = await prisma.abwesenheit.findMany();
+  if (abwesenheitSperrtSlot(abwesenheiten, slot)) {
+    return {
+      ok: false,
+      grund: "Dieser Termin liegt in einer Abwesenheit oder Schließung. Bitte telefonisch.",
+    };
   }
 
   const terminart = await prisma.terminart.findUnique({

@@ -162,3 +162,32 @@ Abstände und Zustände über alle Seiten.
 `npm test` bleibt bei 21/21 grün, Typecheck und Lint sauber.
 
 **Damit abgeschlossen:** Der Design-Durchgang (Schritte 1–4) ist fertig.
+
+## 2026-11-27 - F-003 umgesetzt
+
+**Was:** F-003 „Abwesenheit und Praxisschließung pflegen" ist gebaut. Neues Modell
+`Abwesenheit` (`von`, `bis`, `geltungsbereich`, `art`, optionaler `aerztinId`),
+Enums `Geltungsbereich` und `AbwesenheitArt`, Migration `f003_abwesenheit`. Reine
+Regeln in `lib/rules.ts` (`abwesenheitSperrtSlot`, `findeBetroffeneSlots`,
+`findeBetroffeneTermine`, `pruefeAbwesenheit`), Ablauf in `lib/abwesenheit.ts`
+(`legeAbwesenheitAn`), Seite `/abwesenheit`, „gesperrt"-Badge auf `/plan`. Tests in
+`tests/abwesenheit.test.ts` und `tests/abwesenheit.integration.test.ts`.
+
+**Warum:** Drittes Feature aus Phase 1. v1 verlangt Abwesenheit und
+Praxisschließung inklusive Anzeige betroffener Termine (BR4).
+
+**Entscheidungen:**
+- Der Geltungsbereich steuert die Sperre: `AERZTIN` sperrt nur die Slots einer
+  Ärztin, `PRAXIS` alle Slots des Tages. Ein leerer `aerztinId` bedeutet
+  Praxisschließung (SPEC Beziehung 7).
+- Ein nachträglicher Eintrag markiert betroffene Termine sofort als `BETROFFEN`
+  („betroffen – Umbuchung offen"). Es wird nichts automatisch umgebucht (Out of
+  Scope laut SPEC).
+- Die Online-Buchung (`lib/buchen.ts`) lehnt Slots ab, die in eine hinterlegte
+  Abwesenheit fallen; `getFreieOnlineSlots` blendet sie aus (BR4: „muss vor der
+  Online-Buchung hinterlegt sein").
+- Der Slot-Status in der Datenbank bleibt `frei`/`belegt` wie in der SPEC; ob ein
+  Slot gesperrt ist, wird aus den Abwesenheiten abgeleitet und nur angezeigt.
+
+**Nicht Teil von F-003:** automatisches Umbuchen (Out of Scope), Opt-in-Versand
+der Benachrichtigung (F-004), Akut-Kontingent (F-006).
