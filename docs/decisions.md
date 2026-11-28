@@ -436,3 +436,39 @@ fest: Die App erzwingt BR5 und der Nachtrag belegt keinen Slot.
 **Nicht Teil von F-010:** die Kulanz-Entscheidung selbst (trifft die MFA),
 automatische Puffer zwischen Terminen (Out of Scope, M1-10), Akut-Kontingent
 (F-006).
+
+## 2026-11-28 - F-011 umgesetzt
+
+**Was:** F-011 „Vorab-Fragebogen nach der Online-Buchung" ist gebaut. `Termin`
+bekommt `notiz` (Antworten) und `fragebogenAm` (Zeitpunkt), Migration
+`f011_fragebogen`. Regeln in `lib/rules.ts` (`fragebogenFuer`, `hatFragebogen`,
+`formatiereFragebogenNotiz`), Abläufe in `lib/fragebogen.ts`
+(`speichereFragebogen`, `getFragebogen`), Fragebogen in der Bestätigungskarte von
+`/buchen` (`app/buchen/fragebogen.tsx`), Notiz-Spalte auf `/termine`. Tests in
+`tests/fragebogen.test.ts` und `tests/fragebogen.integration.test.ts`.
+
+**Warum:** M1-12 beschreibt einen Vorab-Fragebogen, dessen Antworten als Notiz am
+Termin landen (am Tresen werden sonst Besuchsgrund, Beschwerdebeginn und Status
+abgefragt). Die SPEC führt ihn unter „später"; im Backlog als F-011.
+
+**Entscheidungen:**
+- Kein eigenes Fragebogen-Modell: Die SPEC verlangt ausdrücklich „Antworten als
+  Notiz am Termin", also liegen die Antworten in `Termin.notiz`.
+- Die Fragen sind reine Regellogik und passen zur Terminart (Vorsorge, Beratung,
+  Impfung, Rezept-Abholung). Akut, Blutabnahme und Erstgespräch haben keinen
+  Fragebogen (nicht online buchbar).
+- Der Fragebogen ist freiwillig (M2-2/M2-3: „erst die Basis") und blockiert die
+  Buchung nicht. Er erscheint nach der Buchung und lässt sich überspringen.
+- `speichereFragebogen` ist idempotent: Ein bereits ausgefüllter Fragebogen wird
+  nicht überschrieben. Nur Online-Termine bekommen einen Fragebogen.
+
+**Nicht Teil von F-011:** erzwungener Fragebogen, Auswertung/Statistik, Versand.
+
+## 2026-11-28 - Backlog abgeschlossen
+
+**Was:** Mit F-011 ist das gesamte Backlog umgesetzt (F-001 bis F-011, Phase 1 und
+Phase 2). Alle Einträge in `docs/backlog.md` stehen auf „fertig".
+
+**Warum:** Stand der Abgabe. Offene fachliche Fragen (Akut-Kontingent-Höhe M2-8,
+Zuständigkeit bei Rezepten, BR2 in v1 oder später) sind in den jeweiligen
+Feature-Einträgen dokumentiert und als Fragen an die Kundin notiert.

@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { CalendarCheck, Search, ShieldCheck, TriangleAlert } from "lucide-react";
 import { buchenAction, type BuchFormState } from "./actions";
+import { Fragebogen } from "./fragebogen";
 
 type Terminart = { id: number; bezeichnung: string; dauerMinuten: number };
 type Slot = {
@@ -91,6 +92,10 @@ export function BookingForm({
         <p className="text-sm text-ink-muted">
           Bitte bringen Sie Ihre Versichertenkarte zum Termin mit.
         </p>
+        <Fragebogen
+          terminId={state.erfolg.terminId}
+          fragen={state.erfolg.fragen}
+        />
       </div>
     );
   }

@@ -177,6 +177,7 @@ export default async function TerminePage() {
                   <th className="px-5 py-3.5 font-medium">Patient:in</th>
                   <th className="px-5 py-3.5 font-medium">Ärztin</th>
                   <th className="px-5 py-3.5 font-medium">Terminart</th>
+                  <th className="px-5 py-3.5 font-medium">Notiz</th>
                   <th className="px-5 py-3.5 font-medium">Kanal</th>
                   <th className="px-5 py-3.5 font-medium">Status</th>
                   <th className="px-5 py-3.5 text-right font-medium">Aktionen</th>
@@ -206,6 +207,18 @@ export default async function TerminePage() {
                             nachtraeglich
                           </span>
                         ) : null}
+                      </td>
+                      <td className="px-5 py-4 text-ink-muted">
+                        {t.notiz ? (
+                          <span
+                            className="block max-w-xs whitespace-pre-line text-xs"
+                            title={t.notiz}
+                          >
+                            {t.notiz}
+                          </span>
+                        ) : (
+                          "—"
+                        )}
                       </td>
                       <td className="px-5 py-4 text-ink-muted">
                         <span className="inline-flex items-center gap-1">

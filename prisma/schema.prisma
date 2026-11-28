@@ -134,6 +134,10 @@ model Termin {
   // erhoeht (MFA-Ermessen).
   noShowAm             DateTime?
   triftigerGrund       String?
+  // F-011: Antworten des Vorab-Fragebogens als Notiz am Termin und der
+  // Zeitpunkt des Ausfuellens (leer = noch offen).
+  notiz                String?
+  fragebogenAm         DateTime?
   patientId            Int
   aerztinId            Int
   terminartId          Int

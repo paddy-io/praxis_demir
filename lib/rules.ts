@@ -390,3 +390,55 @@ export function pruefeNachtrag(nachtrag: {
 export function nachtragBelegtSlot(): boolean {
   return false;
 }
+
+// --- F-011 Vorab-Fragebogen (SPEC "spaeter", M1-12) ---
+// Nach der Online-Buchung beantwortet die Patient:in ein paar Fragen, die zur
+// Terminart passen. Die Antworten landen als Notiz am Termin. Der Fragebogen ist
+// freiwillig ("erst die Basis", M2-2/M2-3).
+
+export type FragebogenFrage = {
+  feld: string;
+  label: string;
+};
+
+const FRAGEBOGEN: Record<string, FragebogenFrage[]> = {
+  Vorsorge: [
+    { feld: "besuchsgrund", label: "Besuchsgrund" },
+    { feld: "beschwerdebeginn", label: "Seit wann bestehen die Beschwerden?" },
+    { feld: "medikamente", label: "Aktuelle Medikamente" },
+  ],
+  Beratung: [
+    { feld: "besuchsgrund", label: "Besuchsgrund" },
+    { feld: "thema", label: "Worum geht es?" },
+  ],
+  Impfung: [
+    { feld: "impfung", label: "Welche Impfung?" },
+    { feld: "impfpass", label: "Impfpass dabei?" },
+  ],
+  "Rezept-Abholung": [
+    { feld: "medikament", label: "Welches Medikament?" },
+  ],
+};
+
+export function fragebogenFuer(bezeichnung: string): FragebogenFrage[] {
+  return FRAGEBOGEN[bezeichnung] ?? [];
+}
+
+export function hatFragebogen(bezeichnung: string): boolean {
+  return fragebogenFuer(bezeichnung).length > 0;
+}
+
+// Baut den Notiztext aus den Fragen und den Antworten. Nur beantwortete Felder
+// werden aufgenommen; leere Antworten fallen weg.
+export function formatiereFragebogenNotiz(
+  bezeichnung: string,
+  antworten: Record<string, string>,
+): string {
+  const zeilen = fragebogenFuer(bezeichnung)
+    .map((frage) => {
+      const wert = antworten[frage.feld]?.trim();
+      return wert ? `${frage.label}: ${wert}` : null;
+    })
+    .filter((zeile): zeile is string => zeile !== null);
+  return zeilen.join("\n");
+}
