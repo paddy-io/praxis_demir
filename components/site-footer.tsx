@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { Clock, MapPin, Phone, Stethoscope } from "lucide-react";
+import { hauptLink, navGroups } from "./nav";
 
 export function SiteFooter() {
+  const alleLinks = navGroups.flatMap((gruppe) => gruppe.links);
+
   return (
     <footer className="mt-24 border-t border-line bg-sand">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="flex size-9 items-center justify-center rounded-full bg-accent text-white">
@@ -31,54 +34,31 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/buchen" className="text-ink transition hover:text-accent">
-                Termin buchen
-              </Link>
-            </li>
-            <li>
-              <Link href="/plan" className="text-ink transition hover:text-accent">
-                Terminplan
-              </Link>
-            </li>
-            <li>
-              <Link href="/termine" className="text-ink transition hover:text-accent">
-                Termine
-              </Link>
-            </li>
-            <li>
-              <Link href="/rezepte" className="text-ink transition hover:text-accent">
-                Rezepte
-              </Link>
-            </li>
-            <li>
               <Link
-                href="/erstgespraech"
+                href={hauptLink.href}
                 className="text-ink transition hover:text-accent"
               >
-                Erstgespräch
+                {hauptLink.label}
               </Link>
             </li>
-            <li>
-              <Link
-                href="/abwesenheit"
-                className="text-ink transition hover:text-accent"
-              >
-                Abwesenheit
-              </Link>
-            </li>
-            <li>
-              <Link href="/noshow" className="text-ink transition hover:text-accent">
-                No-Show
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/einwilligungen"
-                className="text-ink transition hover:text-accent"
-              >
-                Einwilligungen
-              </Link>
-            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="text-xs font-medium tracking-wide text-ink-muted uppercase">
+            Für die Praxis
+          </h2>
+          <ul className="mt-4 space-y-2 text-sm">
+            {alleLinks.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-ink transition hover:text-accent"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 
