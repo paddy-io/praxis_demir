@@ -324,3 +324,38 @@ export function aerztinAbwesend(
 ): boolean {
   return abwesenheitSperrtSlot(abwesenheiten, { datum: tag, aerztinId });
 }
+
+// --- BR8 Erstgespraech vorklaeren (SPEC 4) ---
+// Die MFA fuehrt die telefonische Vorklaerung durch (Versicherung, grobe
+// Situation, Dringlichkeit, Aufnahme moeglich, passende Aerzt:in). Das
+// Erstgespraech selbst fuehrt eine Aerzt:in; es ist nicht online buchbar (BR6).
+
+export function darfErstgespraechVorklaeren(rolle: Rolle): boolean {
+  return rolle === "MFA";
+}
+
+export type Vorklaerung = {
+  situation: string;
+  dringlichkeit: string;
+  aerztinId: number | null;
+};
+
+export function pruefeVorklaerung(
+  vorklaerung: Vorklaerung,
+): { ok: true } | { ok: false; grund: string } {
+  if (!vorklaerung.situation.trim()) {
+    return { ok: false, grund: "Bitte die grobe Situation notieren." };
+  }
+  if (!vorklaerung.dringlichkeit.trim()) {
+    return { ok: false, grund: "Bitte die Dringlichkeit angeben." };
+  }
+  if (!vorklaerung.aerztinId) {
+    return { ok: false, grund: "Bitte eine passende Ärztin wählen." };
+  }
+  return { ok: true };
+}
+
+// BR8: Ohne "Aufnahme moeglich" wird kein Erstgespraechstermin vergeben.
+export function darfTerminVergeben(aufnahmeMoeglich: boolean): boolean {
+  return aufnahmeMoeglich;
+}

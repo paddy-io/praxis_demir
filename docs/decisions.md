@@ -368,3 +368,38 @@ ohne Neustart.
 **Zusammenspiel mit dem `predev`-Hook:** Der Hook stellt sicher, dass vor jedem
 `npm run dev` ein aktueller Client existiert; der Proxy fängt Änderungen während
 eines laufenden Servers ab. Ein Neustart ist damit nicht mehr nötig.
+
+## 2026-11-28 - F-009 umgesetzt
+
+**Was:** F-009 „Erstgespräch telefonisch vorklären und Termin vergeben" ist gebaut.
+Neues Modell `Erstgespraech` (`patientId`, `mfaId`, `aerztinId`, eindeutige
+`terminId`, `situation`, `dringlichkeit`, `aufnahmeMoeglich`, `erfasstAm`),
+Migration `f009_erstgespraech`. Regeln in `lib/rules.ts`
+(`darfErstgespraechVorklaeren`, `pruefeVorklaerung`, `darfTerminVergeben`),
+Abläufe in `lib/erstgespraech.ts` (`erfasseErstgespraech`, `getErstgespraeche`),
+Seite `/erstgespraech`. Tests in `tests/erstgespraech.test.ts` und
+`tests/erstgespraech.integration.test.ts`.
+
+**Warum:** BR8 verlangt die telefonische Vorklärung durch die MFA (Versicherung,
+grobe Situation, Dringlichkeit, Aufnahme möglich, passende Ärztin); das
+Erstgespräch selbst führt eine Ärztin. BR6: nicht online buchbar.
+
+**Entscheidungen:**
+- Das Vorklärungsprotokoll ist ein eigenes Modell, weil BR8 fünf Angaben nennt,
+  die sonst nirgends hingehören (wie `Erinnerung` in F-007).
+- Die MFA kann in der Vorklärung eine **neue Patient:in** anlegen (Status `NEU`);
+  das deckt die SPEC-Annahme §7 ab (Neupatient:innen kommen telefonisch). Eine
+  bestehende Nummer kann ebenso genutzt werden.
+- Ohne „Aufnahme möglich" wird kein Termin vergeben (`darfTerminVergeben`).
+- Der Termin läuft über die bestehende BR5-Logik (`belegeSlot`) und den Kanal
+  `TELEFON`; der Slot wird gesperrt. Es gibt nur einen verknüpften Termin je
+  Vorklärung (eindeutige `terminId`).
+- W1 bleibt gewahrt: Die MFA koordiniert telefonisch, die Ärztin führt das
+  Gespräch. „Erstgespraech" bleibt nicht online buchbar (Test).
+
+**Nicht Teil von F-009:** Online-Buchung von Erstgesprächen (Out of Scope),
+automatische Ärztin-Zuweisung, Vorab-Fragebogen (F-011).
+
+**Hinweis:** Die MFA-Navigation hat jetzt neun Einträge. Das Aufräumen und
+Gruppieren der Navigation ist als eigener kleiner Design-Schritt vorgemerkt
+(kein Feature).

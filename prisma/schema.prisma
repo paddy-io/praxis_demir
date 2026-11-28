@@ -35,6 +35,7 @@ model Aerztin {
   termine      Termin[]
   abwesenheiten Abwesenheit[]
   rezepteFreigegeben Rezeptantrag[] @relation("RezeptFreigegeben")
+  erstgespraeche Erstgespraech[]
 
   @@map("aerztin")
 }
@@ -117,6 +118,7 @@ model Patient {
   einwilligungen       Einwilligung[]
   erinnerungen         Erinnerung[]
   rezeptantraege       Rezeptantrag[]
+  erstgespraeche       Erstgespraech[]
 
   @@map("patient")
 }
@@ -146,6 +148,7 @@ model Termin {
   slot                 Slot           @relation(fields: [slotId], references: [id])
   erfasstVon           MFA?           @relation(fields: [erfasstVonId], references: [id])
   erinnerungen         Erinnerung[]
+  erstgespraech        Erstgespraech?
 
   @@map("termin")
 }
@@ -208,6 +211,7 @@ model MFA {
   name    String
   termine Termin[]
   rezepte Rezeptantrag[] @relation("RezeptAngelegt")
+  erstgespraeche Erstgespraech[]
 
   @@map("mfa")
 }
@@ -271,4 +275,26 @@ model Rezeptantrag {
   freigegebenVon  Aerztin?     @relation("RezeptFreigegeben", fields: [freigegebenVonId], references: [id])
 
   @@map("rezeptantrag")
+}
+
+// --- F-009 Erstgespraech vorklaeren und Termin vergeben (BR6, BR8) ---
+
+// Protokoll der telefonischen Vorklaerung durch die MFA. Das Erstgespraech
+// selbst fuehrt eine Aerzt:in in der Praxis; es ist nicht online buchbar.
+model Erstgespraech {
+  id              Int      @id @default(autoincrement())
+  patientId       Int
+  mfaId           Int
+  aerztinId       Int
+  terminId        Int      @unique
+  situation       String
+  dringlichkeit   String
+  aufnahmeMoeglich Boolean
+  erfasstAm       DateTime @default(now())
+  patient         Patient  @relation(fields: [patientId], references: [id])
+  mfa             MFA      @relation(fields: [mfaId], references: [id])
+  aerztin         Aerztin  @relation(fields: [aerztinId], references: [id])
+  termin          Termin   @relation(fields: [terminId], references: [id])
+
+  @@map("erstgespraech")
 }
