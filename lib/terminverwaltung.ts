@@ -164,8 +164,9 @@ export async function aendereTermin(
       const gesperrt = await belegeSlot(tx, neuerSlot.id);
       if (!gesperrt) throw new Error("SLOT_BELEGT");
 
-      // Alten Slot freigeben, sofern er sich vom neuen unterscheidet.
-      if (termin.slotId !== neuerSlot.id) {
+      // Alten Slot freigeben, sofern vorhanden und vom neuen verschieden.
+      // Ein Nachtrag (F-010) hat keinen Slot.
+      if (termin.slotId !== null && termin.slotId !== neuerSlot.id) {
         await gibSlotFrei(tx, termin.slotId);
       }
 
@@ -205,7 +206,10 @@ export async function sageTerminAb(
       where: { id: terminId },
       data: { status: "ABSAGT" },
     });
-    await gibSlotFrei(tx, termin.slotId);
+    // Nur Termine mit Slot geben ihren Slot wieder frei.
+    if (termin.slotId !== null) {
+      await gibSlotFrei(tx, termin.slotId);
+    }
   });
   return { ok: true, terminId };
 }

@@ -135,7 +135,9 @@ export default async function ErstgespraechPage() {
                     <td className="px-5 py-4 text-ink-muted">{g.dringlichkeit}</td>
                     <td className="px-5 py-4">{g.aerztin.name}</td>
                     <td className="px-5 py-4 tabular">
-                      {formatDatum(g.termin.slot.datum)}, {g.termin.slot.beginn}
+                      {g.termin.slot
+                        ? `${formatDatum(g.termin.slot.datum)}, ${g.termin.slot.beginn}`
+                        : "—"}
                     </td>
                     <td className="px-5 py-4 text-ink-muted">
                       {g.mfa.name}

@@ -55,8 +55,8 @@ export async function buchenAction(
   return {
     erfolg: {
       aerztin: termin?.aerztin.name ?? "",
-      datum: termin ? termin.slot.datum.toLocaleDateString("de-DE") : "",
-      beginn: termin?.slot.beginn ?? "",
+      datum: termin?.slot ? termin.slot.datum.toLocaleDateString("de-DE") : "",
+      beginn: termin?.slot?.beginn ?? "",
     },
   };
 }

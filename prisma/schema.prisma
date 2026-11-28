@@ -36,6 +36,7 @@ model Aerztin {
   abwesenheiten Abwesenheit[]
   rezepteFreigegeben Rezeptantrag[] @relation("RezeptFreigegeben")
   erstgespraeche Erstgespraech[]
+  nachtraege    Nachtrag[] @relation("NachtragAbsprache")
 
   @@map("aerztin")
 }
@@ -140,15 +141,17 @@ model Termin {
   // Buchungen haben keine MFA (SPEC Beziehung 10).
   erfasstVonId         Int?
   // BR5: hoechstens ein Termin je Slot. Die Eindeutigkeit erzwingt das auf
-  // Datenbank-Ebene, unabhaengig vom Kanal.
-  slotId               Int            @unique
+  // Datenbank-Ebene, unabhaengig vom Kanal. F-010: Ein nachtraeglich erfasster
+  // Kulanz-Termin hat keinen Slot (W2: "ohne einen Slot zu belegen").
+  slotId               Int?           @unique
   patient              Patient        @relation(fields: [patientId], references: [id])
   aerztin              Aerztin        @relation(fields: [aerztinId], references: [id])
   terminart            Terminart      @relation(fields: [terminartId], references: [id])
-  slot                 Slot           @relation(fields: [slotId], references: [id])
+  slot                 Slot?          @relation(fields: [slotId], references: [id])
   erfasstVon           MFA?           @relation(fields: [erfasstVonId], references: [id])
   erinnerungen         Erinnerung[]
   erstgespraech        Erstgespraech?
+  nachtrag             Nachtrag?
 
   @@map("termin")
 }
@@ -297,4 +300,21 @@ model Erstgespraech {
   termin          Termin   @relation(fields: [terminId], references: [id])
 
   @@map("erstgespraech")
+}
+
+// --- F-010 Nachtrag erfassen (informelle Kulanz, BR1/W2) ---
+
+// Ein nachtraeglich erfasster Termin, den die MFA in Absprache mit einer Aerzt:in
+// informell in den Praxisablauf geschoben hat. Er belegt keinen Slot.
+model Nachtrag {
+  id             Int      @id @default(autoincrement())
+  terminId       Int      @unique
+  abspracheMitId Int
+  datum          DateTime
+  notiz          String?
+  erfasstAm      DateTime @default(now())
+  termin         Termin   @relation(fields: [terminId], references: [id], onDelete: Cascade)
+  abspracheMit   Aerztin  @relation("NachtragAbsprache", fields: [abspracheMitId], references: [id])
+
+  @@map("nachtrag")
 }

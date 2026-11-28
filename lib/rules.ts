@@ -135,15 +135,19 @@ export function findeBetroffeneSlots<T extends SlotBezug>(
   return slots.filter((slot) => abwesenheitSperrtSlot(abwesenheiten, slot));
 }
 
+// F-010: Ein nachtraeglich erfasster Termin hat keinen Slot. Solche Termine
+// koennen nie von einer Abwesenheit betroffen sein.
 export type TerminBezug = {
-  slot: SlotBezug;
+  slot: SlotBezug | null;
 };
 
 export function findeBetroffeneTermine<T extends TerminBezug>(
   abwesenheiten: AbwesenheitsRegel[],
   termine: T[],
 ): T[] {
-  return termine.filter((termin) => abwesenheitSperrtSlot(abwesenheiten, termin.slot));
+  return termine.filter(
+    (termin) => termin.slot !== null && abwesenheitSperrtSlot(abwesenheiten, termin.slot),
+  );
 }
 
 // Geltungsbereich und aerztinId muessen zusammenpassen: eine Praxisschliessung
@@ -358,4 +362,31 @@ export function pruefeVorklaerung(
 // BR8: Ohne "Aufnahme moeglich" wird kein Erstgespraechstermin vergeben.
 export function darfTerminVergeben(aufnahmeMoeglich: boolean): boolean {
   return aufnahmeMoeglich;
+}
+
+// --- BR1/W2 Nachtrag (informelle Kulanz) ---
+// Eine MFA kann in Absprache mit einer Aerzt:in einen zusaetzlichen Termin
+// einschieben. Er wird nachtraeglich erfasst und als "nachtraeglich erfasst"
+// gekennzeichnet. Die App erzwingt BR5 und belegt dabei KEINEN Slot.
+
+export function darfNachtragErfassen(rolle: Rolle): boolean {
+  return rolle === "MFA";
+}
+
+export function pruefeNachtrag(nachtrag: {
+  datum: Date | null;
+  abspracheMitId: number | null;
+}): { ok: true } | { ok: false; grund: string } {
+  if (!nachtrag.datum || Number.isNaN(nachtrag.datum.getTime())) {
+    return { ok: false, grund: "Bitte das Datum des Nachtrags angeben." };
+  }
+  if (!nachtrag.abspracheMitId) {
+    return { ok: false, grund: "Bitte angeben, mit wem der Nachtrag abgesprochen ist." };
+  }
+  return { ok: true };
+}
+
+// W2: Ein Nachtrag belegt keinen Slot. Die Funktion macht die Regel testbar.
+export function nachtragBelegtSlot(): boolean {
+  return false;
 }

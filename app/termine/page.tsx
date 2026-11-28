@@ -2,13 +2,23 @@ import {
   BadgeCheck,
   CalendarClock,
   CalendarOff,
+  ClipboardList,
   ClipboardPlus,
   ListChecks,
   Phone,
 } from "lucide-react";
-import { getFreieSlots, getMFAs, getTerminarten, getTermine } from "@/lib/data";
+import {
+  getAerztinnen,
+  getFreieSlots,
+  getMFAs,
+  getTerminarten,
+  getTermine,
+} from "@/lib/data";
+import { getNachtraege } from "@/lib/nachtrag";
+import { prisma } from "@/lib/prisma";
 import { terminAenderbar } from "@/lib/rules";
 import { ErfassenForm } from "./erfassen-form";
+import { NachtragForm } from "./nachtrag-form";
 import { TerminAktionen } from "./termin-aktionen";
 
 export const dynamic = "force-dynamic";
@@ -65,12 +75,17 @@ function Abschnitt({
 }
 
 export default async function TerminePage() {
-  const [terminarten, slots, termine, mfas] = await Promise.all([
-    getTerminarten(),
-    getFreieSlots(),
-    getTermine(),
-    getMFAs(),
-  ]);
+  const [terminarten, slots, termine, mfas, nachtraege, aerztinnen] =
+    await Promise.all([
+      getTerminarten(),
+      getFreieSlots(),
+      getTermine(),
+      getMFAs(),
+      getNachtraege(prisma),
+      getAerztinnen(),
+    ]);
+
+  const nachtragIds = new Set(nachtraege.map((n) => n.terminId));
 
   const slotLabel = (s: {
     id: number;
@@ -122,6 +137,23 @@ export default async function TerminePage() {
       </Abschnitt>
 
       <Abschnitt
+        icon={ClipboardList}
+        titel="Nachtrag (Kulanz)"
+        beschreibung="Zusätzlichen Termin in Absprache mit einer Ärztin eintragen. Belegt keinen Slot."
+      >
+        <div className="rounded-card border border-line bg-surface p-6 shadow-sm sm:p-7">
+          <NachtragForm
+            terminarten={terminarten.map((a) => ({
+              id: a.id,
+              bezeichnung: a.bezeichnung,
+            }))}
+            aerztinnen={aerztinnen.map((a) => ({ id: a.id, name: a.name }))}
+            mfas={mfas.map((m) => ({ id: m.id, name: m.name }))}
+          />
+        </div>
+      </Abschnitt>
+
+      <Abschnitt
         icon={ListChecks}
         titel="Alle Termine"
         beschreibung="Umbuchen oder absagen; abgeschlossene Termine sind gesperrt."
@@ -161,12 +193,19 @@ export default async function TerminePage() {
                       key={t.id}
                       className="border-b border-line align-top transition last:border-0 hover:bg-sand"
                     >
-                      <td className="px-5 py-4 tabular">{formatDatum(t.slot.datum)}</td>
-                      <td className="px-5 py-4 tabular">{t.slot.beginn}</td>
+                      <td className="px-5 py-4 tabular">
+                        {t.slot ? formatDatum(t.slot.datum) : "—"}
+                      </td>
+                      <td className="px-5 py-4 tabular">{t.slot?.beginn ?? "—"}</td>
                       <td className="px-5 py-4">{t.patient.name}</td>
                       <td className="px-5 py-4 text-ink-muted">{t.aerztin.name}</td>
                       <td className="px-5 py-4 text-ink-muted">
                         {t.terminart.bezeichnung}
+                        {nachtragIds.has(t.id) ? (
+                          <span className="mt-1 block w-fit rounded-pill bg-sand px-2 py-0.5 text-xs font-medium text-ink-muted">
+                            nachtraeglich
+                          </span>
+                        ) : null}
                       </td>
                       <td className="px-5 py-4 text-ink-muted">
                         <span className="inline-flex items-center gap-1">

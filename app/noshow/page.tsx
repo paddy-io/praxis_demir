@@ -97,7 +97,7 @@ export default async function NoShowPage() {
             <NoShowForm
               kandidaten={kandidaten.map((t) => ({
                 id: t.id,
-                label: `${formatDatum(t.slot.datum)}, ${t.slot.beginn} · ${t.patient.name} · ${t.aerztin.name}`,
+                label: `${t.slot ? `${formatDatum(t.slot.datum)}, ${t.slot.beginn}` : "nachtraeglich"} · ${t.patient.name} · ${t.aerztin.name}`,
               }))}
             />
           )}

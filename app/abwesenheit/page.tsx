@@ -170,8 +170,10 @@ export default async function AbwesenheitPage() {
                     key={t.id}
                     className="border-b border-line transition last:border-0 hover:bg-sand"
                   >
-                    <td className="px-5 py-4 tabular">{formatDatum(t.slot.datum)}</td>
-                    <td className="px-5 py-4 tabular">{t.slot.beginn}</td>
+                    <td className="px-5 py-4 tabular">
+                      {t.slot ? formatDatum(t.slot.datum) : "—"}
+                    </td>
+                    <td className="px-5 py-4 tabular">{t.slot?.beginn ?? "—"}</td>
                     <td className="px-5 py-4">{t.patient.name}</td>
                     <td className="px-5 py-4 text-ink-muted">{t.aerztin.name}</td>
                     <td className="px-5 py-4 text-ink-muted">{t.terminart.bezeichnung}</td>

@@ -403,3 +403,36 @@ automatische Ärztin-Zuweisung, Vorab-Fragebogen (F-011).
 **Hinweis:** Die MFA-Navigation hat jetzt neun Einträge. Das Aufräumen und
 Gruppieren der Navigation ist als eigener kleiner Design-Schritt vorgemerkt
 (kein Feature).
+
+## 2026-11-28 - F-010 umgesetzt
+
+**Was:** F-010 „Nachtrag erfassen und als ‚nachtraeglich erfasst' kennzeichnen" ist
+gebaut. `Termin.slotId` ist jetzt optional (`Int?`, bleibt eindeutig); neues Modell
+`Nachtrag` (`terminId` eindeutig, `abspracheMitId`, `datum`, `notiz`, `erfasstAm`),
+Migration `f010_nachtrag`. Regeln in `lib/rules.ts` (`darfNachtragErfassen`,
+`pruefeNachtrag`, `nachtragBelegtSlot`), Abläufe in `lib/nachtrag.ts`
+(`erfasseNachtrag`, `getNachtraege`), neuer Abschnitt „Nachtrag (Kulanz)" auf
+`/termine`. Tests in `tests/nachtrag.test.ts` und
+`tests/nachtrag.integration.test.ts`.
+
+**Warum:** BR1 erlaubt der MFA, in Absprache mit einer Ärzt:in einen zusätzlichen
+Termin einzuschieben (informelle Kulanz), der nachträglich erfasst wird. W2 hält
+fest: Die App erzwingt BR5 und der Nachtrag belegt keinen Slot.
+
+**Entscheidungen:**
+- Ein Nachtrag ist ein `Termin` mit `slotId = null` und
+  `nachtraeglichErfasst = true`, Kanal `TELEFON`. Es wird kein Slot belegt oder
+  angelegt; `nachtragBelegtSlot()` macht die Regel testbar.
+- `Termin.slotId` wurde dafür optional. In SQLite erlaubt ein Unique-Index mehrere
+  `NULL`, BR5 („ein Slot, ein Termin") bleibt also vollständig erhalten.
+- Das `Nachtrag`-Modell hält die Absprache-Ärzt:in und das Datum fest (wie
+  `Erinnerung` in F-007 und `Erstgespraech` in F-009).
+- Alle Stellen, die `termin.slot` anzeigen, sind jetzt null-sicher; Termine ohne
+  Slot zeigen „nachtraeglich" bzw. „—". Umbuchen/Absagen behandeln `slotId = null`
+  sauber (kein Freigeben eines nicht vorhandenen Slots).
+- Kein neuer Menüpunkt: Der Nachtrag liegt auf `/termine`, wo die MFA Termine
+  verwaltet. Die Navigation bleibt bei neun Einträgen.
+
+**Nicht Teil von F-010:** die Kulanz-Entscheidung selbst (trifft die MFA),
+automatische Puffer zwischen Terminen (Out of Scope, M1-10), Akut-Kontingent
+(F-006).
